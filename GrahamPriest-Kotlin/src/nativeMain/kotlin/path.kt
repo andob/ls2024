@@ -1,5 +1,3 @@
-package com.deduction
-
 class ProofTreePath(val nodes : List<ProofTreeNode>)
 {
     fun isContradictory() : Boolean
@@ -10,21 +8,13 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
         }
 
         val leafFormula = nodes.last().formula
-        if (leafFormula is BinaryFormula)
-        {
-            throw RuntimeException("The tree is not completely expanded!")
-        }
 
-        if (leafFormula is UnaryFormula && leafFormula.operation == Operation.Non && leafFormula.x !is Predicate)
+        val (leafPredicate, leafPredicateValue) = when
         {
-            throw RuntimeException("The tree is not completely expanded!")
-        }
-
-        val (leafPredicate, leafPredicateValue) = when (leafFormula)
-        {
-            is Predicate -> Pair(leafFormula, true)
-            is UnaryFormula -> Pair(leafFormula.x as Predicate, false)
-            else -> throw RuntimeException("The tree is not completely expanded!")
+            /* P*/ leafFormula is AtomicFormula -> Pair(leafFormula, true)
+            /*~P*/ leafFormula is ComplexFormula && leafFormula.operation == Operation.Non &&
+                   leafFormula.x is AtomicFormula -> Pair(leafFormula.x, false)
+            else -> return false //tree is not yet completely expanded here
         }
 
         if (leafPredicateValue)
@@ -33,8 +23,8 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
             for (index in 0 until nodes.size-1)
             {
                 val node = nodes[index]
-                if (node.formula is UnaryFormula && node.formula.operation == Operation.Non &&
-                    node.formula.x is Predicate && node.formula.x == leafPredicate)
+                if (node.formula is ComplexFormula && node.formula.operation == Operation.Non &&
+                    node.formula.x is AtomicFormula && node.formula.x == leafPredicate)
                 {
                     return true
                 }
@@ -46,7 +36,7 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
             for (index in 0 until nodes.size-1)
             {
                 val node = nodes[index]
-                if (node.formula is Predicate && node.formula == leafPredicate)
+                if (node.formula is AtomicFormula && node.formula == leafPredicate)
                 {
                     return true
                 }
@@ -59,5 +49,20 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
     fun plus(node : ProofTreeNode) : ProofTreePath
     {
         return ProofTreePath(nodes.plus(node))
+    }
+
+    fun size() : Int
+    {
+        return nodes.size
+    }
+
+    fun getOrNull(index : Int) : ProofTreeNode?
+    {
+        return nodes.getOrNull(index)
+    }
+
+    override fun toString() : String
+    {
+        return nodes.joinToString(separator = " -> ")
     }
 }

@@ -1,1 +1,1 @@
-rootProject.name = "deduction_demo"
+rootProject.name = "GrahamPriestDeduction"
