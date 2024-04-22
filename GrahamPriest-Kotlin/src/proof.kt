@@ -1,9 +1,8 @@
-data class Theory
+class Theory
 (
-    val premises : List<IFormula> = listOf(),
+    val premises : List<IFormula>,
     val conclusion : IFormula,
-    val possibleWorlds : List<PossibleWorld> = listOf(),
-    val shouldStopOnFirstContradiction : Boolean = true,
+    val logic : ILogic = DEFAULT_LOGIC,
 )
 {
     fun prove() : ProofTree
@@ -13,25 +12,18 @@ data class Theory
         val decompositionQueue = ArrayDeque<ProofTreeNode>()
         decompositionQueue.addAll(proofTree)
 
-        while (!decompositionQueue.isEmpty())
+        while (!decompositionQueue.isEmpty() && proofTree.nodeIdSequence.hasNext())
         {
             val node = decompositionQueue.removeFirst()
 
-            val subtree = RULES.find { rule -> rule.isApplicable(node) }?.apply(node)
+            val subtree = logic.getRules().find { rule -> rule.isApplicable(node) }?.apply(node)
             if (subtree != null)
             {
-                proofTree.append(subtree)
+                proofTree.appendSubtree(subtree, node.id)
 
                 proofTree.checkForContradictions()
 
-                if (subtree.left != null && !subtree.left.isContradictory)
-                {
-                    decompositionQueue.add(subtree.left)
-                }
-                if (subtree.right != null && !subtree.right.isContradictory)
-                {
-                    decompositionQueue.add(subtree.right)
-                }
+                decompositionQueue.addAll(subtree.getAllChildNodes())
             }
         }
 
@@ -40,24 +32,32 @@ data class Theory
 
     private fun buildInitialProofTree() : ProofTree
     {
+        var id = 0L
+        val formulaFactory = conclusion.formulaFactory
+        val nonConclusion = formulaFactory.new(Operation.Non, conclusion)
+
         if (premises.isEmpty())
         {
-            return ProofTree(ProofTreeNode(conclusion))
+            val tree = ProofTree(ProofTreeNode(--id, nonConclusion))
+            tree.attachNodeFactory(ProofTreeNodeFactory(tree))
+            return tree
         }
 
-        val rootNode = ProofTreeNode(premises.first())
+        val rootNode = ProofTreeNode(--id, premises.first())
         var node = rootNode
 
         for (index in 1 until premises.size)
         {
             val premise = premises[index]
-            node.left = ProofTreeNode(premise)
+            node.left = ProofTreeNode(--id, premise)
             node = node.left!!
         }
 
-        val nonConclusion = ComplexFormula(Operation.Non, conclusion)
-        node.left = ProofTreeNode(nonConclusion)
-        return ProofTree(rootNode)
+        node.left = ProofTreeNode(--id, nonConclusion)
+
+        val tree = ProofTree(rootNode)
+        tree.attachNodeFactory(ProofTreeNodeFactory(tree))
+        return tree
     }
 }
 

@@ -1,26 +1,23 @@
 interface IRule
 {
     fun isApplicable(node : ProofTreeNode) : Boolean
-    fun apply(node : ProofTreeNode) : ProofSubtree
+
+    fun apply(node : ProofTreeNode) = apply(RuleApplyFactory(node), node)
+    fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
 }
 
-val RULES = arrayOf(
-    DoubleNegationRule(),
-    OrRule(),
-    NotOrRule(),
-    AndRule(),
-    NotAndRule(),
-    ImplyRule(),
-    NotImplyRule(),
-    BiImplyRule(),
-    NotBiImplyRule(),
+class RuleApplyFactory(private val node : ProofTreeNode)
+{
+    fun newNode(formula : IFormula, left : ProofTreeNode? = null, right : ProofTreeNode? = null) : ProofTreeNode
+    {
+        return node.nodeFactory!!.newNode(formula, left, right)
+    }
 
-    //modal logic rules
-    NotNecessaryRule(),
-    NotPossibleRule(),
-    NecessaryRule(),
-    PossibleRule(),
-)
+    fun newFormula(operation : Operation, x : IFormula) : IFormula
+    {
+        return node.formula.formulaFactory.new(operation, x)
+    }
+}
 
 class DoubleNegationRule : IRule
 {
@@ -30,11 +27,11 @@ class DoubleNegationRule : IRule
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.Non
     }
 
-    override fun apply(node : ProofTreeNode) : ProofSubtree
+    override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         node.formula as ComplexFormula
         node.formula.x as ComplexFormula
-        return ProofSubtree(left = ProofTreeNode(node.formula.x.x))
+        return ProofSubtree(left = factory.newNode(node.formula.x.x))
     }
 }
 
@@ -45,12 +42,12 @@ class OrRule : IRule
         return (node.formula as? ComplexFormula)?.operation == Operation.Or
     }
 
-    override fun apply(node : ProofTreeNode) : ProofSubtree
+    override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         node.formula as ComplexFormula
         return ProofSubtree(
-            left = ProofTreeNode(node.formula.x),
-            right = ProofTreeNode(node.formula.y!!),
+            left = factory.newNode(node.formula.x),
+            right = factory.newNode(node.formula.y!!),
         )
     }
 }
@@ -63,14 +60,14 @@ class NotOrRule : IRule
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.Or
     }
 
-    override fun apply(node : ProofTreeNode) : ProofSubtree
+    override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         node.formula as ComplexFormula
         node.formula.x as ComplexFormula
         return ProofSubtree(
-            left = ProofTreeNode(
-                ComplexFormula(Operation.Non, node.formula.x.x),
-                left = ProofTreeNode(ComplexFormula(Operation.Non, node.formula.x.y!!)),
+            left = factory.newNode(
+                node.formula.formulaFactory.new(Operation.Non, node.formula.x.x),
+                left = factory.newNode(node.formula.formulaFactory.new(Operation.Non, node.formula.x.y!!)),
             )
         )
     }
@@ -83,13 +80,13 @@ class AndRule : IRule
         return (node.formula as? ComplexFormula)?.operation == Operation.And
     }
 
-    override fun apply(node : ProofTreeNode) : ProofSubtree
+    override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         node.formula as ComplexFormula
         return ProofSubtree(
-            left = ProofTreeNode(
-                node.formula.x,
-                left = ProofTreeNode(node.formula.y!!),
+            left = factory.newNode(
+                formula = node.formula.x,
+                left = factory.newNode(node.formula.y!!),
             )
         )
     }
@@ -103,13 +100,13 @@ class NotAndRule : IRule
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.And
     }
 
-    override fun apply(node : ProofTreeNode) : ProofSubtree
+    override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         node.formula as ComplexFormula
         node.formula.x as ComplexFormula
         return ProofSubtree(
-            left = ProofTreeNode(ComplexFormula(Operation.Non, node.formula.x.x)),
-            right = ProofTreeNode(ComplexFormula(Operation.Non, node.formula.x.y!!)),
+            left = factory.newNode(factory.newFormula(Operation.Non, node.formula.x.x)),
+            right = factory.newNode(factory.newFormula(Operation.Non, node.formula.x.y!!)),
         )
     }
 }
@@ -121,12 +118,12 @@ class ImplyRule : IRule
         return (node.formula as? ComplexFormula)?.operation == Operation.Imply
     }
 
-    override fun apply(node : ProofTreeNode) : ProofSubtree
+    override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         node.formula as ComplexFormula
         return ProofSubtree(
-            left = ProofTreeNode(ComplexFormula(Operation.Non, node.formula.x)),
-            right = ProofTreeNode(node.formula.y!!),
+            left = factory.newNode(factory.newFormula(Operation.Non, node.formula.x)),
+            right = factory.newNode(node.formula.y!!),
         )
     }
 }
@@ -139,14 +136,14 @@ class NotImplyRule : IRule
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.Imply
     }
 
-    override fun apply(node : ProofTreeNode) : ProofSubtree
+    override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         node.formula as ComplexFormula
         node.formula.x as ComplexFormula
         return ProofSubtree(
-            left = ProofTreeNode(
-                node.formula.x.x,
-                left = ProofTreeNode(ComplexFormula(Operation.Non, node.formula.x.y!!)),
+            left = factory.newNode(
+                formula = node.formula.x.x,
+                left = factory.newNode(node.formula.formulaFactory.new(Operation.Non, node.formula.x.y!!)),
             )
         )
     }
@@ -159,17 +156,17 @@ class BiImplyRule : IRule
         return (node.formula as? ComplexFormula)?.operation == Operation.BiImply
     }
 
-    override fun apply(node : ProofTreeNode) : ProofSubtree
+    override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         node.formula as ComplexFormula
         return ProofSubtree(
-            left = ProofTreeNode(
-                node.formula.x,
-                left = ProofTreeNode(node.formula.y!!)
+            left = factory.newNode(
+                formula = node.formula.x,
+                left = factory.newNode(node.formula.y!!)
             ),
-            right = ProofTreeNode(
-                ComplexFormula(Operation.Non, node.formula.x),
-                left = ProofTreeNode(ComplexFormula(Operation.Non, node.formula.y))
+            right = factory.newNode(
+                formula = factory.newFormula(Operation.Non, node.formula.x),
+                left = factory.newNode(factory.newFormula(Operation.Non, node.formula.y))
             ),
         )
     }
@@ -183,18 +180,18 @@ class NotBiImplyRule : IRule
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.BiImply
     }
 
-    override fun apply(node : ProofTreeNode) : ProofSubtree
+    override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         node.formula as ComplexFormula
         node.formula.x as ComplexFormula
         return ProofSubtree(
-            left = ProofTreeNode(
-                node.formula.x,
-                left = ProofTreeNode(ComplexFormula(Operation.Non, node.formula.x.y!!))
+            left = factory.newNode(
+                formula = node.formula.x.x,
+                left = factory.newNode(factory.newFormula(Operation.Non, node.formula.x.y!!))
             ),
-            right = ProofTreeNode(
-                node.formula.x,
-                left = ProofTreeNode(ComplexFormula(Operation.Non, node.formula.x.y))
+            right = factory.newNode(
+                formula = factory.newFormula(Operation.Non, node.formula.x.x),
+                left = factory.newNode(node.formula.x.y)
             ),
         )
     }
