@@ -5,11 +5,20 @@ class ProofTree
 {
     private var isProofCorrect = false
 
-    val nodeIdSequence : Iterator<Long> = object : Iterator<Long>
+    val nodeIdSequence = object : Iterator<Long>
     {
         private var id : Long = 0
         override fun hasNext() : Boolean = id < Long.MAX_VALUE
         override fun next() : Long = id++
+    }
+
+    //todo deploy to server, git commit
+    val predicateArgumentInstanceNameSequence = object : Iterator<String>
+    {
+        private var char : Char = 'a'
+        private var secondaryIndex : Long = 0
+        override fun hasNext() : Boolean = (char < 'z' && secondaryIndex < Long.MAX_VALUE)
+        override fun next() : String = if (char <= 'z') "${char++}" else "c${secondaryIndex++}"
     }
 
     fun appendSubtree(subtree : ProofSubtree, nodeId : Long)
@@ -26,15 +35,11 @@ class ProofTree
 
     fun checkForContradictions()
     {
-        for ((leaf, path) in getAllLeafsWithPaths())
-        {
-            if (path.isContradictory())
-            {
-                leaf.isContradictory = true
-            }
-        }
+        val leafs = getAllLeafsWithPaths()
+        val numberOfContradictoryLeafs = leafs
+            .filter { (_, path) -> path.isContradictory() }.size
 
-        if (getAllLeafs().all { leaf -> leaf.isContradictory })
+        if (numberOfContradictoryLeafs == leafs.size)
         {
             this.isProofCorrect = true
         }
@@ -71,6 +76,13 @@ class ProofTree
         val initialPath = ProofTreePath(nodes = listOf(rootNode))
         val detectedPath = this.rootNode.findPathUntilNode(node, initialPath)
         return detectedPath ?: initialPath
+    }
+
+    fun getPathFromRootNodeToNodeIncludingLeafs(node : ProofTreeNode) : ProofTreePath
+    {
+        val paths = getAllLeafsWithPaths().map { (_, path) -> path }
+        val foundPath = paths.find { path -> path.nodes.contains(node) }
+        return foundPath ?: ProofTreePath(listOf(rootNode))
     }
 
     fun getAllForkedWorlds() : List<PossibleWorld>
@@ -111,6 +123,14 @@ class ProofTreeNode
 )
 {
     var isContradictory = false
+
+    override fun hashCode() = hash(id, formula, left, right)
+    override fun equals(other : Any?) : Boolean
+    {
+        return (other as? ProofTreeNode)?.let { that ->
+            that.id == this.id && that.formula == this.formula
+        }?:false
+    }
 
     override fun toString() = formula.toString()
 
@@ -194,10 +214,16 @@ class ProofTreeNode
         return proofTree.getParentNodeOfNode(this)
     }
 
-    fun getPathFromRootNode() : ProofTreePath
+    fun getPathFromRootNodeToNode() : ProofTreePath
     {
         val proofTree = this.nodeFactory!!.tree
         return proofTree.getPathFromRootNodeToNode(this)
+    }
+
+    fun getPathFromRootNodeToNodeIncludingLeafs() : ProofTreePath
+    {
+        val proofTree = this.nodeFactory!!.tree
+        return proofTree.getPathFromRootNodeToNodeIncludingLeafs(this)
     }
 
     class PrintAsSubtreeFormatOptions

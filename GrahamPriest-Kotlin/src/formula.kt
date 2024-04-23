@@ -11,18 +11,59 @@ open class Operation(val sign : Char, val isUnary : Boolean)
         val Possible = Operation(sign = '◇', isUnary = true)
     }
 
-    class ForAny(val x : String) : Operation(sign = '∀', isUnary = true)
-    class Exists(val x : String) : Operation(sign = '∃', isUnary = true)
-
     override fun equals(other : Any?) = (other as? Operation)?.sign==sign
     override fun hashCode() = sign.hashCode()
     override fun toString() = sign.toString()
+
+    class ForAll(val x : BindingPredicateArgument) : Operation(sign = '∀', isUnary = true)
+    {
+        override fun equals(other : Any?) = super.equals(other) && (other as? ForAll)?.x==x
+        override fun hashCode() = hash(sign, x)
+        override fun toString() = "$sign$x"
+    }
+
+    class Exists(val x : BindingPredicateArgument) : Operation(sign = '∃', isUnary = true)
+    {
+        override fun equals(other : Any?) = super.equals(other) && (other as? Exists)?.x==x
+        override fun hashCode() = hash(sign, x)
+        override fun toString() = "$sign$x"
+    }
 }
 
 interface IFormula
 {
     val possibleWorld : PossibleWorld
     val formulaFactory : FormulaFactory
+
+    fun cloned() : IFormula
+    {
+        return when(val original = this)
+        {
+            is AtomicFormula -> AtomicFormula(original.name, original.arguments.cloned(), original.possibleWorld, original.formulaFactory)
+            is ComplexFormula -> ComplexFormula(original.x, original.operation, original.y, original.possibleWorld, original.formulaFactory)
+            else -> original
+        }
+    }
+
+    fun findAllAtoms() : List<AtomicFormula>
+    {
+        val outAtoms = mutableListOf<AtomicFormula>()
+        findAllAtoms(outAtoms)
+        return outAtoms
+    }
+
+    private fun findAllAtoms(outAtoms : MutableList<AtomicFormula>)
+    {
+        if (this is AtomicFormula)
+        {
+            outAtoms.add(this)
+        }
+        else if (this is ComplexFormula)
+        {
+            this.x.findAllAtoms(outAtoms)
+            this.y?.findAllAtoms(outAtoms)
+        }
+    }
 }
 
 class FormulaFactory
@@ -31,12 +72,22 @@ class FormulaFactory
     private val possibleWorld : PossibleWorld = PossibleWorld(0),
 )
 {
-    fun newAtom(name : String) : IFormula
+    fun newAtom(name : String) : AtomicFormula
     {
-        return AtomicFormula(name, possibleWorld, formulaFactory = this)
+        return AtomicFormula(name, arguments = emptyList(), possibleWorld, formulaFactory = this)
     }
 
-    fun new(operation : Operation, x : IFormula) : IFormula
+    fun newBindingVariable(name : String) : BindingPredicateArgument
+    {
+        return BindingPredicateArgument(name)
+    }
+
+    fun newUnboundedVariable(name : String) : UnboundedPredicateArgument
+    {
+        return UnboundedPredicateArgument(name)
+    }
+
+    fun new(operation : Operation, x : IFormula) : ComplexFormula
     {
         if (!logic.isOperationAvailable(operation))
             throw RuntimeException("Operation $operation is not available in ${logic::class.simpleName}!")
@@ -44,7 +95,7 @@ class FormulaFactory
         return ComplexFormula(x, operation, y = null, possibleWorld, formulaFactory = this)
     }
 
-    fun new(x : IFormula, operation : Operation, y : IFormula) : IFormula
+    fun new(x : IFormula, operation : Operation, y : IFormula) : ComplexFormula
     {
         if (!logic.isOperationAvailable(operation))
             throw RuntimeException("Operation $operation is not available in ${logic::class.simpleName}!")
@@ -56,20 +107,41 @@ class FormulaFactory
 class AtomicFormula
 (
     val name : String,
+    val arguments : List<IPredicateArgument>,
     override val possibleWorld : PossibleWorld,
     override val formulaFactory : FormulaFactory,
 ) : IFormula
 {
+    operator fun invoke(vararg arguments : IPredicateArgument) : AtomicFormula
+    {
+        val newArguments = this.arguments.plus(arguments)
+        return AtomicFormula(name, newArguments, possibleWorld, formulaFactory)
+    }
+
+    override fun hashCode() = name.hashCode()
     override fun equals(other : Any?) : Boolean
     {
         return (other as? AtomicFormula)?.let { that ->
             that.name == this.name &&
-            that.possibleWorld == this.possibleWorld
+            that.possibleWorld == this.possibleWorld &&
+            that.arguments.size == this.arguments.size &&
+            (0 until that.arguments.size).all { i -> that.arguments[i] == this.arguments[i] }
         }?:false
     }
 
-    override fun hashCode() = name.hashCode()
-    override fun toString() = name
+    fun isReplaceableWith(that : AtomicFormula) : Boolean
+    {
+        return that.name == this.name &&
+            that.possibleWorld == this.possibleWorld &&
+            that.arguments.size == this.arguments.size &&
+            (0 until that.arguments.size).all { i -> that.arguments[i].isReplaceableWith(this.arguments[i]) }
+    }
+
+    override fun toString() : String
+    {
+        return if (arguments.isEmpty()) name
+        else "$name(${arguments.joinToString(separator = ",")})"
+    }
 }
 
 class ComplexFormula
@@ -89,6 +161,7 @@ class ComplexFormula
             throw RuntimeException("$operation should use two arguments!")
     }
 
+    override fun hashCode() = hash(x, y, operation)
     override fun equals(other : Any?) : Boolean
     {
         return (other as? ComplexFormula)?.let { that ->
@@ -96,11 +169,6 @@ class ComplexFormula
             that.operation == this.operation &&
             that.possibleWorld == this.possibleWorld
         }?:false
-    }
-
-    override fun hashCode() : Int
-    {
-        return (31 * (31 * x.hashCode()) + (y?.hashCode()?:0)) + operation.hashCode()
     }
 
     override fun toString() : String
@@ -116,15 +184,5 @@ class ComplexFormula
         //this is a binary formula
         val yString = if (y is ComplexFormula && !y.operation.isUnary) "($y)" else "$y"
         return "$xString $operation $yString"
-    }
-}
-
-fun IFormula.cloned() : IFormula
-{
-    return when(val original = this)
-    {
-        is AtomicFormula -> AtomicFormula(original.name, original.possibleWorld, original.formulaFactory)
-        is ComplexFormula -> ComplexFormula(original.x, original.operation, original.y, original.possibleWorld, original.formulaFactory)
-        else -> this
     }
 }

@@ -2,35 +2,30 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
 {
     fun isContradictory() : Boolean
     {
-        if (nodes.size >= 2)
-        {
-            val isLastNodeContradictory = isContradictoryAtNodeIndex(nodes.size-1)
-            val isLastButNotLeastNodeContradictory = isContradictoryAtNodeIndex(nodes.size-2)
-            return isLastNodeContradictory || isLastButNotLeastNodeContradictory
-        }
-
-        return false
+        val contradictoryNodeIndices = nodes.indices.filter { index -> isContradictoryAtIndex(index) }
+        contradictoryNodeIndices.forEach { index -> nodes[index].isContradictory = true }
+        return contradictoryNodeIndices.isNotEmpty()
     }
 
-    private fun isContradictoryAtNodeIndex(index : Int) : Boolean
+    private fun isContradictoryAtIndex(targetIndex : Int) : Boolean
     {
-        val leafFormulaRaw = nodes[index].formula
-        val (leafFormula, leafFormulaValue) = when
+        val targetNode = nodes[targetIndex]
+        val (targetFormula, targetFormulaValue) = when
         {
-            /* P*/ leafFormulaRaw is AtomicFormula -> Pair(leafFormulaRaw, true)
-            /*~P*/ leafFormulaRaw is ComplexFormula && leafFormulaRaw.operation == Operation.Non &&
-                   leafFormulaRaw.x is AtomicFormula -> Pair(leafFormulaRaw.x, false)
+            /* P*/ targetNode.formula is AtomicFormula -> Pair(targetNode.formula, true)
+            /*~P*/ targetNode.formula is ComplexFormula && targetNode.formula.operation == Operation.Non &&
+                    targetNode.formula.x is AtomicFormula -> Pair(targetNode.formula.x, false)
             else -> return false //tree is not yet completely expanded here
         }
 
-        if (leafFormulaValue)
+        if (targetFormulaValue)
         {
             //leaf is P = true, find node where P = false
-            for (index in 0 until index)
+            for (j in 0 until targetIndex)
             {
-                val node = nodes[index]
+                val node = nodes[j]
                 if (node.formula is ComplexFormula && node.formula.operation == Operation.Non &&
-                    node.formula.x is AtomicFormula && node.formula.x == leafFormula)
+                    node.formula.x is AtomicFormula && node.formula.x.isReplaceableWith(targetFormula))
                 {
                     return true
                 }
@@ -39,10 +34,10 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
         else
         {
             //leaf is P = false, find node where P = true
-            for (index in 0 until index)
+            for (j in 0 until targetIndex)
             {
-                val node = nodes[index]
-                if (node.formula is AtomicFormula && node.formula == leafFormula)
+                val node = nodes[j]
+                if (node.formula is AtomicFormula && node.formula.isReplaceableWith(targetFormula))
                 {
                     return true
                 }
@@ -66,6 +61,15 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
     {
         return nodes.filter { node -> node.formula.possibleWorld.index>0 }
                 .map { node -> node.formula.possibleWorld }
+                .distinct().sortedDescending()
+    }
+
+    fun getAllInstantiatedPredicateArguments() : List<BindingPredicateArgument>
+    {
+        return nodes.flatMap { node -> node.formula.findAllAtoms() }
+                .flatMap { atomicFormula -> atomicFormula.arguments }
+                .filterIsInstance<BindingPredicateArgument>()
+                .filter { argument -> argument.isInstantiated() }
                 .distinct().sortedDescending()
     }
 

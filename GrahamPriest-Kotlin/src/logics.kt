@@ -41,12 +41,12 @@ class FirstOrderLogic : ILogic
     override fun getRules() : Array<IRule>
     {
         return arrayOf(*BASIC_RULES,
-            NotExistsRule(), NotForAnyRule(), ExistsRule(), ForAnyRule())
+            NotExistsRule(), NotForAllRule(), ExistsRule(), ForAllRule())
     }
 
     override fun isOperationAvailable(operation : Operation) : Boolean
     {
-        return operation in BASIC_OPERATIONS || operation is Operation.ForAny || operation is Operation.Exists
+        return operation in BASIC_OPERATIONS || operation is Operation.ForAll || operation is Operation.Exists
     }
 }
 
@@ -72,12 +72,12 @@ class FirstOrderModalLogic(val type : ModalLogicType) : ILogic
     {
         return arrayOf(*BASIC_RULES,
             NotNecessaryRule(), NotPossibleRule(), NecessaryRule(), PossibleRule(),
-            NotExistsRule(), NotForAnyRule(), ExistsRule(), ForAnyRule())
+            NotExistsRule(), NotForAllRule(), ExistsRule(), ForAllRule())
     }
 
     override fun isOperationAvailable(operation : Operation) : Boolean
     {
         return operation in BASIC_OPERATIONS || operation == Operation.Possible || operation == Operation.Necessary
-                || operation is Operation.ForAny || operation is Operation.Exists
+                || operation is Operation.ForAll || operation is Operation.Exists
     }
 }

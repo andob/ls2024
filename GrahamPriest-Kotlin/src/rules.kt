@@ -13,9 +13,14 @@ class RuleApplyFactory(private val node : ProofTreeNode)
         return node.nodeFactory!!.newNode(formula, left, right)
     }
 
-    fun newFormula(operation : Operation, x : IFormula) : IFormula
+    fun newFormula(operation : Operation, x : IFormula) : ComplexFormula
     {
         return node.formula.formulaFactory.new(operation, x)
+    }
+
+    fun newPredicateArgumentInstanceName() : String
+    {
+        return node.nodeFactory!!.tree.predicateArgumentInstanceNameSequence.next()
     }
 }
 

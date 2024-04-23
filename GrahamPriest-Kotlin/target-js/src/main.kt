@@ -2,7 +2,15 @@ import kotlinx.browser.document
 
 fun main()
 {
-    val result = test()
+    val resultDiv = document.getElementById("resultDiv")
 
-    document.getElementById("resultDiv")?.textContent = result
+    try
+    {
+        resultDiv?.textContent = test()
+    }
+    catch (ex : Throwable)
+    {
+        resultDiv?.textContent = ex.stackTraceToString()
+        console.log(ex)
+    }
 }

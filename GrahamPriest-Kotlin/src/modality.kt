@@ -49,21 +49,19 @@ class NecessaryRule : IRule
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
-        node.formula as ComplexFormula
-
-        val path = node.getPathFromRootNode()
+        val path = node.getPathFromRootNodeToNode()
         val forkedWorlds = path.getAllForkedWorlds()
         if (forkedWorlds.isEmpty())
         {
-            //todo to ask: is this rule ok?
             return PossibleRule().apply(factory, node)
         }
 
         var outputNode : ProofTreeNode? = null
+        val originalSubFormula = (node.formula as ComplexFormula).x
         for (forkedWorld in forkedWorlds)
         {
             val previousOutputNode = outputNode
-            outputNode = factory.newNode(node.formula.x.inWorld(forkedWorld))
+            outputNode = factory.newNode(originalSubFormula.inWorld(forkedWorld))
             outputNode.comment = "${node.formula.possibleWorld}R${forkedWorld}"
             outputNode.left = previousOutputNode
         }
@@ -81,12 +79,11 @@ class PossibleRule : IRule
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
-        node.formula as ComplexFormula
-
-        val path = node.getPathFromRootNode()
+        val path = node.getPathFromRootNodeToNode()
         val currentWorld = path.getWorldToBeForked()
         val forkedWorld = currentWorld.fork()
-        val newNode = factory.newNode(node.formula.x.inWorld(forkedWorld))
+        val originalSubFormula = (node.formula as ComplexFormula).x
+        val newNode = factory.newNode(originalSubFormula.inWorld(forkedWorld))
         newNode.comment = "${currentWorld}R${forkedWorld}"
         return ProofSubtree(left = newNode)
     }
@@ -102,9 +99,9 @@ fun IFormula.inWorld(possibleWorld : PossibleWorld) : IFormula
 {
     return when(val original = this)
     {
-        is AtomicFormula -> AtomicFormula(original.name, possibleWorld, original.formulaFactory.inWorld(possibleWorld))
+        is AtomicFormula -> AtomicFormula(original.name, original.arguments, possibleWorld, original.formulaFactory.inWorld(possibleWorld))
         is ComplexFormula -> ComplexFormula(original.x.inWorld(possibleWorld), original.operation, original.y?.inWorld(possibleWorld),
                                 possibleWorld, original.formulaFactory.inWorld(possibleWorld))
-        else -> this
+        else -> original
     }
 }
