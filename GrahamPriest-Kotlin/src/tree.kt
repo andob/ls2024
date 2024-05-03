@@ -12,7 +12,6 @@ class ProofTree
         override fun next() : Long = id++
     }
 
-    //todo deploy to server, git commit
     val predicateArgumentInstanceNameSequence = object : Iterator<String>
     {
         private var char : Char = 'a'
@@ -229,7 +228,7 @@ class ProofTreeNode
     class PrintAsSubtreeFormatOptions
     (
         val shouldShowPossibleWorlds : Boolean,
-        val shouldAlwaysIncrementIndent : Boolean = true,
+        val shouldAlwaysIncrementIndent : Boolean = false,
     )
 
     fun printAsSubtreeToStringBuilder(stringBuilder : StringBuilder, options : PrintAsSubtreeFormatOptions, indent : Int = 0)

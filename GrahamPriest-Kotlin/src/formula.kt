@@ -32,6 +32,7 @@ open class Operation(val sign : Char, val isUnary : Boolean)
 
 interface IFormula
 {
+    //todo move possibleWorld to node?
     val possibleWorld : PossibleWorld
     val formulaFactory : FormulaFactory
 

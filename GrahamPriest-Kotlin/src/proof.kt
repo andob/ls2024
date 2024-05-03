@@ -1,3 +1,4 @@
+//todo rename
 class Theory
 (
     val premises : List<IFormula>,
@@ -9,6 +10,7 @@ class Theory
     {
         val proofTree = buildInitialProofTree()
 
+        //todo do not use a queue
         val decompositionQueue = ArrayDeque<ProofTreeNode>()
         decompositionQueue.addAll(proofTree)
 

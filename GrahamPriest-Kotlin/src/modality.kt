@@ -40,6 +40,7 @@ class NotPossibleRule : IRule
     }
 }
 
+//todo necessary should not be consumed right away
 class NecessaryRule : IRule
 {
     override fun isApplicable(node : ProofTreeNode) : Boolean
@@ -49,10 +50,16 @@ class NecessaryRule : IRule
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
+        //todo no - get all forked worlds different than node.formula.possibleWorld
         val path = node.getPathFromRootNodeToNode()
         val forkedWorlds = path.getAllForkedWorlds()
         if (forkedWorlds.isEmpty())
         {
+            //todo should not fork new world. instead, should use current world
+            //todo diamond should have priority over box
+//            val originalSubFormula = (node.formula as ComplexFormula).x
+//            val newNode = factory.newNode(originalSubFormula.cloned())
+//            return ProofSubtree(left = newNode)
             return PossibleRule().apply(factory, node)
         }
 
