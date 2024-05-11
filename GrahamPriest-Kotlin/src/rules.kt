@@ -18,9 +18,19 @@ class RuleApplyFactory(private val node : ProofTreeNode)
         return node.formula.formulaFactory.new(operation, x)
     }
 
+    fun newModalRelationDescriptor(fromWorld : PossibleWorld, toWorld : PossibleWorld) : ModalRelationDescriptorFormula
+    {
+        return node.formula.formulaFactory.newModalRelationDescriptor(fromWorld, toWorld)
+    }
+
     fun newPredicateArgumentInstanceName() : String
     {
         return node.nodeFactory!!.tree.predicateArgumentInstanceNameSequence.next()
+    }
+
+    fun getLogic() : ILogic
+    {
+        return node.formula.formulaFactory.logic
     }
 }
 

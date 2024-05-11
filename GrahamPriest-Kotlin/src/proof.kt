@@ -1,22 +1,20 @@
-//todo rename
 class Theory
 (
+    val logic : ILogic,
     val premises : List<IFormula>,
     val conclusion : IFormula,
-    val logic : ILogic = DEFAULT_LOGIC,
 )
 {
     fun prove() : ProofTree
     {
         val proofTree = buildInitialProofTree()
 
-        //todo do not use a queue
-        val decompositionQueue = ArrayDeque<ProofTreeNode>()
-        decompositionQueue.addAll(proofTree)
+        val decompositionQueue = DecompositionPriorityQueue()
+        decompositionQueue.push(proofTree)
 
         while (!decompositionQueue.isEmpty() && proofTree.nodeIdSequence.hasNext())
         {
-            val node = decompositionQueue.removeFirst()
+            val node = decompositionQueue.pop() ?: continue
 
             val subtree = logic.getRules().find { rule -> rule.isApplicable(node) }?.apply(node)
             if (subtree != null)
@@ -25,7 +23,16 @@ class Theory
 
                 proofTree.checkForContradictions()
 
-                decompositionQueue.addAll(subtree.getAllChildNodes())
+                decompositionQueue.push(subtree)
+
+                val isSubtreeEmpty = subtree.getAllChildNodes().none { subtreeNode ->
+                    subtreeNode.formula is AtomicFormula || subtreeNode.formula is ComplexFormula
+                }
+
+                if (isSubtreeEmpty && decompositionQueue.isNodeReusable(node))
+                {
+                    decompositionQueue.banReusableNode(node)
+                }
             }
         }
 
@@ -63,10 +70,106 @@ class Theory
     }
 }
 
-private fun ArrayDeque<ProofTreeNode>.addAll(proofTree : ProofTree) = addAllImpl(proofTree.rootNode)
-private fun ArrayDeque<ProofTreeNode>.addAllImpl(proofTreeNode : ProofTreeNode)
+class DecompositionPriorityQueue
 {
-    proofTreeNode.left?.let(this::addAllImpl)
-    proofTreeNode.right?.let(this::addAllImpl)
-    addLast(proofTreeNode)
+    private enum class Priority { High, Normal, Low }
+
+    private val consumableNodes = mutableListOf<ProofTreeNode>()
+    private val reusableNodes = mutableListOf<ProofTreeNode>()
+    private val nearlyBannedReusableNodes = mutableMapOf<ProofTreeNode, Int>()
+    private val bannedReusableNodes = mutableListOf<ProofTreeNode>()
+
+    companion object { const val REUSABLE_NODES_BAN_THRESHOLD = 10 }
+
+    fun isEmpty() : Boolean
+    {
+        return consumableNodes.isEmpty() && reusableNodes.isEmpty()
+    }
+
+    fun push(tree : ProofTree)
+    {
+        pushImpl(tree.rootNode)
+    }
+
+    fun push(subtree : ProofSubtree)
+    {
+        pushImpl(subtree.left)
+        pushImpl(subtree.right)
+    }
+
+    private fun pushImpl(node : ProofTreeNode?)
+    {
+        if (node?.left != null) { pushImpl(node.left) }
+        if (node?.right != null) { pushImpl(node.right) }
+        if (node != null) { consumableNodes.add(node) }
+    }
+
+    fun pop() : ProofTreeNode?
+    {
+        if (consumableNodes.isEmpty() && reusableNodes.isNotEmpty())
+        {
+            val reusableNode = reusableNodes.removeAt(0)
+            if (!bannedReusableNodes.contains(reusableNode))
+                consumableNodes.add(reusableNode)
+        }
+
+        if (consumableNodes.isEmpty())
+            return null
+
+        for (priority in arrayOf(Priority.High, Priority.Normal, Priority.Low))
+        {
+            for (index in 0 until consumableNodes.size)
+            {
+                val node = consumableNodes[index]
+                if (getNodePriority(node) == priority)
+                {
+                    consumableNodes.removeAt(index)
+                    if (shouldNodeBeReused(node))
+                        reusableNodes.add(node)
+
+                    return node
+                }
+            }
+        }
+
+        return null
+    }
+
+    private fun getNodePriority(node : ProofTreeNode) : Priority
+    {
+        return when
+        {
+            node.formula is ComplexFormula && node.formula.operation == Operation.Necessary -> Priority.Low
+            else -> Priority.Normal
+        }
+    }
+
+    private fun shouldNodeBeReused(node : ProofTreeNode) : Boolean
+    {
+        return when
+        {
+            bannedReusableNodes.contains(node) -> false
+            node.formula is ComplexFormula && node.formula.operation == Operation.Necessary -> true
+            else -> false
+        }
+    }
+
+    fun isNodeReusable(node : ProofTreeNode) : Boolean
+    {
+        return reusableNodes.contains(node)
+    }
+
+    fun banReusableNode(node : ProofTreeNode)
+    {
+        val numberOfStrikes = nearlyBannedReusableNodes[node]?:0
+        if (numberOfStrikes < REUSABLE_NODES_BAN_THRESHOLD)
+        {
+            nearlyBannedReusableNodes[node] = numberOfStrikes+1
+        }
+        else
+        {
+            bannedReusableNodes.add(node)
+            nearlyBannedReusableNodes.remove(node)
+        }
+    }
 }

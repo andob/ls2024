@@ -12,9 +12,18 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
         val targetNode = nodes[targetIndex]
         val (targetFormula, targetFormulaValue) = when
         {
-            /* P*/ targetNode.formula is AtomicFormula -> Pair(targetNode.formula, true)
-            /*~P*/ targetNode.formula is ComplexFormula && targetNode.formula.operation == Operation.Non &&
+            /*  P*/ targetNode.formula is AtomicFormula -> Pair(targetNode.formula, true)
+
+            /* ~P*/ targetNode.formula is ComplexFormula && targetNode.formula.operation == Operation.Non &&
                     targetNode.formula.x is AtomicFormula -> Pair(targetNode.formula.x, false)
+
+            /* ◇P*/ targetNode.formula is ComplexFormula && targetNode.formula.operation.isModal &&
+                    targetNode.formula.x is AtomicFormula -> Pair(targetNode.formula, true)
+
+            /*~◇P*/ targetNode.formula is ComplexFormula && targetNode.formula.operation == Operation.Non &&
+                    targetNode.formula.x is ComplexFormula && targetNode.formula.x.operation.isModal &&
+                    targetNode.formula.x.x is AtomicFormula -> Pair(targetNode.formula.x, false)
+
             else -> return false //tree is not yet completely expanded here
         }
 
@@ -25,7 +34,17 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
             {
                 val node = nodes[j]
                 if (node.formula is ComplexFormula && node.formula.operation == Operation.Non &&
-                    node.formula.x is AtomicFormula && node.formula.x.isReplaceableWith(targetFormula))
+                    node.formula.x is AtomicFormula && targetFormula is AtomicFormula &&
+                    node.formula.x.isReplaceableWith(targetFormula))
+                {
+                    return true
+                }
+
+                if (node.formula is ComplexFormula && node.formula.operation == Operation.Non &&
+                    node.formula.x is ComplexFormula && node.formula.x.operation.isModal &&
+                    targetFormula is ComplexFormula && targetFormula.operation.isModal &&
+                    node.formula.x.x is AtomicFormula && targetFormula.x is AtomicFormula &&
+                    node.formula.x.x.isReplaceableWith(targetFormula.x))
                 {
                     return true
                 }
@@ -37,7 +56,17 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
             for (j in 0 until targetIndex)
             {
                 val node = nodes[j]
-                if (node.formula is AtomicFormula && node.formula.isReplaceableWith(targetFormula))
+                if (node.formula is AtomicFormula && targetFormula is AtomicFormula &&
+                    node.formula.isReplaceableWith(targetFormula))
+                {
+                    return true
+                }
+
+                if (node.formula is ComplexFormula && node.formula.operation.isModal &&
+                    targetFormula is ComplexFormula && targetFormula.operation == Operation.Non &&
+                    targetFormula.x is ComplexFormula && targetFormula.x.operation.isModal &&
+                    node.formula.x is AtomicFormula && targetFormula.x.x is AtomicFormula &&
+                    node.formula.x.isReplaceableWith(targetFormula.x.x))
                 {
                     return true
                 }
@@ -47,20 +76,24 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
         return false
     }
 
-    fun plus(node : ProofTreeNode) : ProofTreePath
+    fun plus(newNode : ProofTreeNode) : ProofTreePath
     {
-        return ProofTreePath(nodes.plus(node))
+        return ProofTreePath(nodes.plus(newNode))
     }
 
-    fun getWorldToBeForked() : PossibleWorld
+    fun plus(newNodes : List<ProofTreeNode>) : ProofTreePath
     {
-        return nodes.maxOf { node -> node.formula.possibleWorld }
+        return ProofTreePath(nodes.plus(newNodes))
     }
 
-    fun getAllForkedWorlds() : List<PossibleWorld>
+    fun getAllFormulas() : List<IFormula>
     {
-        return nodes.filter { node -> node.formula.possibleWorld.index>0 }
-                .map { node -> node.formula.possibleWorld }
+        return nodes.map { node -> node.formula }
+    }
+
+    fun getAllPossibleWorlds() : List<PossibleWorld>
+    {
+        return nodes.map { node -> node.formula.possibleWorld }
                 .distinct().sortedDescending()
     }
 

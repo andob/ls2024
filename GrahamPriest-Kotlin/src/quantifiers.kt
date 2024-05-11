@@ -134,7 +134,7 @@ class ForAllRule : IRule
         val originalFormula = node.formula as ComplexFormula
         val argument = (originalFormula.operation as Operation.ForAll).x
 
-        val path = node.getPathFromRootNodeToNodeIncludingLeafs()
+        val path = node.getPathFromRootToLeafsThroughNode()
         val previousInstances = path.getAllInstantiatedPredicateArguments()
             .filter { instance -> instance.isReplaceableWith(argument) }
         if (previousInstances.isEmpty())
@@ -142,17 +142,14 @@ class ForAllRule : IRule
             return ExistsRule().apply(factory, node)
         }
 
-        var outputNode : ProofTreeNode? = null
+        val outputNodes = mutableListOf<ProofTreeNode>()
         for (previousInstance in previousInstances)
         {
-            val modifiedFormula = originalFormula.x.instantiated(argument, previousInstance.instanceName!!)
-
-            val previousOutputNode = outputNode
-            outputNode = factory.newNode(modifiedFormula)
-            outputNode.left = previousOutputNode
+            val instantiatedFormula = originalFormula.x.instantiated(argument, previousInstance.instanceName!!)
+            outputNodes.add(factory.newNode(instantiatedFormula))
         }
 
-        return ProofSubtree(left = outputNode)
+        return ProofSubtree.newWithSequentialVerticalNodesOnLeft(outputNodes)
     }
 }
 

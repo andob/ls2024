@@ -16,7 +16,7 @@ kotlin {
     sourceSets {
         jsMain {
             kotlin.srcDirs = ['./src', '../src']
-            //todo resources.srcDirs = ['./res']
+            resources.srcDirs = ['./res']
         }
     }
 }

@@ -64,29 +64,16 @@ class ProofTree
         this.rootNode.attachNodeFactory(nodeFactory)
     }
 
-    fun getParentNodeOfNode(node : ProofTreeNode) : ProofTreeNode?
-    {
-        val path = getPathFromRootNodeToNode(node)
-        return path.nodes.getOrNull(path.nodes.size-2)
-    }
-
-    fun getPathFromRootNodeToNode(node : ProofTreeNode) : ProofTreePath
-    {
-        val initialPath = ProofTreePath(nodes = listOf(rootNode))
-        val detectedPath = this.rootNode.findPathUntilNode(node, initialPath)
-        return detectedPath ?: initialPath
-    }
-
-    fun getPathFromRootNodeToNodeIncludingLeafs(node : ProofTreeNode) : ProofTreePath
+    fun getPathFromRootToLeafsThroughNode(node : ProofTreeNode) : ProofTreePath
     {
         val paths = getAllLeafsWithPaths().map { (_, path) -> path }
         val foundPath = paths.find { path -> path.nodes.contains(node) }
         return foundPath ?: ProofTreePath(listOf(rootNode))
     }
 
-    fun getAllForkedWorlds() : List<PossibleWorld>
+    fun getAllPossibleWorlds() : List<PossibleWorld>
     {
-        return getAllLeafsWithPaths().flatMap { (_, path) -> path.getAllForkedWorlds() }.distinct().sortedDescending()
+        return getAllLeafsWithPaths().flatMap { (_, path) -> path.getAllPossibleWorlds() }.distinct().sortedDescending()
     }
 
     override fun toString() : String
@@ -94,7 +81,8 @@ class ProofTree
         val isProvedStr = if (this.isProofCorrect) "PROVED!" else "NOT PROVED!"
 
         val formatOptions = ProofTreeNode.PrintAsSubtreeFormatOptions(
-            shouldShowPossibleWorlds = getAllForkedWorlds().isNotEmpty())
+            shouldShowPossibleWorlds = getAllPossibleWorlds().size >= 2,
+        )
 
         val stringBuilder = StringBuilder()
         stringBuilder.append(isProvedStr).append('\n')
@@ -117,7 +105,6 @@ class ProofTreeNode
     val formula : IFormula,
     var left : ProofTreeNode? = null,
     var right : ProofTreeNode? = null,
-    var comment : String? = null,
     var nodeFactory : ProofTreeNodeFactory? = null,
 )
 {
@@ -133,7 +120,7 @@ class ProofTreeNode
 
     override fun toString() = formula.toString()
 
-    fun cloned() : ProofTreeNode = ProofTreeNode(id, formula.cloned(), left?.cloned(), right?.cloned(), comment, nodeFactory)
+    fun cloned() : ProofTreeNode = ProofTreeNode(id, formula.cloned(), left?.cloned(), right?.cloned(), nodeFactory)
 
     fun findAllLeafs(outLeafs : MutableList<ProofTreeNode>)
     {
@@ -207,28 +194,16 @@ class ProofTreeNode
         return 1 + nodeCountOnLeft + nodeCountOnRight
     }
 
-    fun getParentNode() : ProofTreeNode?
+    fun getPathFromRootToLeafsThroughNode() : ProofTreePath
     {
         val proofTree = this.nodeFactory!!.tree
-        return proofTree.getParentNodeOfNode(this)
-    }
-
-    fun getPathFromRootNodeToNode() : ProofTreePath
-    {
-        val proofTree = this.nodeFactory!!.tree
-        return proofTree.getPathFromRootNodeToNode(this)
-    }
-
-    fun getPathFromRootNodeToNodeIncludingLeafs() : ProofTreePath
-    {
-        val proofTree = this.nodeFactory!!.tree
-        return proofTree.getPathFromRootNodeToNodeIncludingLeafs(this)
+        return proofTree.getPathFromRootToLeafsThroughNode(this)
     }
 
     class PrintAsSubtreeFormatOptions
     (
         val shouldShowPossibleWorlds : Boolean,
-        val shouldAlwaysIncrementIndent : Boolean = false,
+        val shouldAlwaysIncrementIndent : Boolean = true,
     )
 
     fun printAsSubtreeToStringBuilder(stringBuilder : StringBuilder, options : PrintAsSubtreeFormatOptions, indent : Int = 0)
@@ -242,12 +217,7 @@ class ProofTreeNode
 
         stringBuilder.append(this.formula)
 
-        if (!this.comment.isNullOrEmpty())
-        {
-            stringBuilder.append(' ').append(this.comment)
-        }
-
-        if (options.shouldShowPossibleWorlds)
+        if (options.shouldShowPossibleWorlds && this.formula !is ModalRelationDescriptorFormula)
         {
             stringBuilder.append(' ').append(this.formula.possibleWorld)
         }
@@ -274,10 +244,31 @@ class ProofTreeNode
 
 class ProofSubtree
 (
-    val left : ProofTreeNode? = null,
+    val left : ProofTreeNode?,
     val right : ProofTreeNode? = null,
 )
 {
+    companion object
+    {
+        fun empty() : ProofSubtree
+        {
+            return ProofSubtree(left = null)
+        }
+
+        fun newWithSequentialVerticalNodesOnLeft(nodes : List<ProofTreeNode>) : ProofSubtree
+        {
+            if (nodes.size >= 2)
+            {
+                for (index in 1 until nodes.size)
+                {
+                    nodes[index-1].left = nodes[index]
+                }
+            }
+
+            return ProofSubtree(left = nodes.getOrNull(0))
+        }
+    }
+
     fun getAllChildNodes() : List<ProofTreeNode>
     {
         val nodesOnLeft = left?.getAllChildNodes() ?: listOf()

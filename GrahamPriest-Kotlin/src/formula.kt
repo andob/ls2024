@@ -1,28 +1,28 @@
-open class Operation(val sign : Char, val isUnary : Boolean)
+open class Operation(val sign : Char, val isUnary : Boolean, val isModal : Boolean)
 {
     companion object
     {
-        val Non = Operation(sign = '~', isUnary = true)
-        val And = Operation(sign = '&', isUnary = false)
-        val Or = Operation(sign = 'v', isUnary = false)
-        val Imply = Operation(sign = '→', isUnary = false)
-        val BiImply = Operation(sign = '↔', isUnary = false)
-        val Necessary = Operation(sign = '□', isUnary = true)
-        val Possible = Operation(sign = '◇', isUnary = true)
+        val Non = Operation(sign = '~', isUnary = true, isModal = false)
+        val And = Operation(sign = '&', isUnary = false, isModal = false)
+        val Or = Operation(sign = 'v', isUnary = false, isModal = false)
+        val Imply = Operation(sign = '→', isUnary = false, isModal = false)
+        val BiImply = Operation(sign = '↔', isUnary = false, isModal = false)
+        val Necessary = Operation(sign = '□', isUnary = true, isModal = true)
+        val Possible = Operation(sign = '◇', isUnary = true, isModal = true)
     }
 
     override fun equals(other : Any?) = (other as? Operation)?.sign==sign
     override fun hashCode() = sign.hashCode()
     override fun toString() = sign.toString()
 
-    class ForAll(val x : BindingPredicateArgument) : Operation(sign = '∀', isUnary = true)
+    class ForAll(val x : BindingPredicateArgument) : Operation(sign = '∀', isUnary = true, isModal = false)
     {
         override fun equals(other : Any?) = super.equals(other) && (other as? ForAll)?.x==x
         override fun hashCode() = hash(sign, x)
         override fun toString() = "$sign$x"
     }
 
-    class Exists(val x : BindingPredicateArgument) : Operation(sign = '∃', isUnary = true)
+    class Exists(val x : BindingPredicateArgument) : Operation(sign = '∃', isUnary = true, isModal = false)
     {
         override fun equals(other : Any?) = super.equals(other) && (other as? Exists)?.x==x
         override fun hashCode() = hash(sign, x)
@@ -32,7 +32,6 @@ open class Operation(val sign : Char, val isUnary : Boolean)
 
 interface IFormula
 {
-    //todo move possibleWorld to node?
     val possibleWorld : PossibleWorld
     val formulaFactory : FormulaFactory
 
@@ -42,6 +41,7 @@ interface IFormula
         {
             is AtomicFormula -> AtomicFormula(original.name, original.arguments.cloned(), original.possibleWorld, original.formulaFactory)
             is ComplexFormula -> ComplexFormula(original.x, original.operation, original.y, original.possibleWorld, original.formulaFactory)
+            is ModalRelationDescriptorFormula -> ModalRelationDescriptorFormula(original.fromWorld, original.toWorld, original.formulaFactory)
             else -> original
         }
     }
@@ -69,7 +69,7 @@ interface IFormula
 
 class FormulaFactory
 (
-    val logic : ILogic = DEFAULT_LOGIC,
+    val logic : ILogic,
     private val possibleWorld : PossibleWorld = PossibleWorld(0),
 )
 {
@@ -102,6 +102,11 @@ class FormulaFactory
             throw RuntimeException("Operation $operation is not available in ${logic::class.simpleName}!")
 
         return ComplexFormula(x, operation, y, possibleWorld, formulaFactory = this)
+    }
+
+    fun newModalRelationDescriptor(fromWorld : PossibleWorld, toWorld : PossibleWorld) : ModalRelationDescriptorFormula
+    {
+        return ModalRelationDescriptorFormula(fromWorld, toWorld, formulaFactory = this)
     }
 }
 
@@ -185,5 +190,29 @@ class ComplexFormula
         //this is a binary formula
         val yString = if (y is ComplexFormula && !y.operation.isUnary) "($y)" else "$y"
         return "$xString $operation $yString"
+    }
+}
+
+class ModalRelationDescriptorFormula
+(
+    override val possibleWorld : PossibleWorld,
+    private val targetPossibleWorld : PossibleWorld,
+    override val formulaFactory : FormulaFactory,
+) : IFormula
+{
+    val fromWorld get() = possibleWorld
+    val toWorld get() = targetPossibleWorld
+
+    override fun hashCode() = hash(fromWorld, toWorld)
+    override fun equals(other : Any?) : Boolean
+    {
+        return (other as? ModalRelationDescriptorFormula)?.let { that ->
+            that.fromWorld == this.fromWorld && that.toWorld == this.toWorld
+        }?:false
+    }
+
+    override fun toString() : String
+    {
+        return "${fromWorld}R$toWorld"
     }
 }

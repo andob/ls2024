@@ -4,20 +4,6 @@ interface ILogic
     fun isOperationAvailable(operation : Operation) : Boolean
 }
 
-/*todo modal logic types:
-* ρ (rho), reflexivity: for all w, wRw.
-* σ (sigma), symmetry: for all w1 , w2 , if w1 Rw2 , then w2Rw1.
-* τ (tau), transitivity: for all w1 , w2 , w3 , if w1 Rw2 and w2 Rw3, then w1Rw3.
-* η (eta), extendability: for all w1 , there is a w2 such that w1 Rw2.
-* K = {}
-* T = { ρ }
-* D = { η }
-* B = { ρ, σ }
-* S4 = { ρ, τ }
-* S5 = { ρ, σ, τ }
-*/
-val DEFAULT_LOGIC = FirstOrderModalLogic(ModalLogicType.S5)
-
 private val BASIC_RULES = arrayOf(
     DoubleNegationRule(),
     OrRule(),
@@ -62,10 +48,10 @@ class FirstOrderLogic : ILogic
     }
 }
 
-enum class ModalLogicType { S5 }
-
 class ModalLogic(val type : ModalLogicType) : ILogic
 {
+    val previousResultsOfNecessaryRule = NecessaryRule.PreviousResults()
+
     override fun getRules() : Array<IRule>
     {
         return arrayOf(*BASIC_RULES,

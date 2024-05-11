@@ -1,5 +1,7 @@
 
 fun main()
 {
-    println(test())
+    val logger = { logLine : String -> println(logLine) }
+
+    test(logger)
 }
