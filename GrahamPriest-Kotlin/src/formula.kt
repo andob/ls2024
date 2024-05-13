@@ -4,7 +4,7 @@ open class Operation(val sign : Char, val isUnary : Boolean, val isModal : Boole
     {
         val Non = Operation(sign = '~', isUnary = true, isModal = false)
         val And = Operation(sign = '&', isUnary = false, isModal = false)
-        val Or = Operation(sign = 'v', isUnary = false, isModal = false)
+        val Or = Operation(sign = '∨', isUnary = false, isModal = false)
         val Imply = Operation(sign = '→', isUnary = false, isModal = false)
         val BiImply = Operation(sign = '↔', isUnary = false, isModal = false)
         val Necessary = Operation(sign = '□', isUnary = true, isModal = true)

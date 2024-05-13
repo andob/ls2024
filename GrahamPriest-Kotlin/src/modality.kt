@@ -86,7 +86,7 @@ class NecessaryRule : IRule
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
-        val modalLogic = factory.getLogic() as ModalLogic
+        val modalLogic = factory.getLogic() as FirstOrderModalLogic
         val originalSubFormula = (node.formula as ComplexFormula).x
 
         val path = node.getPathFromRootToLeafsThroughNode()
@@ -122,7 +122,7 @@ class NecessaryRule : IRule
         return ProofSubtree.empty()
     }
 
-    private fun buildNecessityGraph(modalLogic : ModalLogic, path : ProofTreePath) : Graph<PossibleWorld>
+    private fun buildNecessityGraph(modalLogic : FirstOrderModalLogic, path : ProofTreePath) : Graph<PossibleWorld>
     {
         val graph = Graph.withNodes(path.getAllPossibleWorlds())
 
@@ -192,6 +192,11 @@ class NecessaryRule : IRule
             }
 
             return false
+        }
+
+        fun clear()
+        {
+            data.clear()
         }
     }
 }

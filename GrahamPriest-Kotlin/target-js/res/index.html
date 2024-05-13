@@ -6,10 +6,21 @@
 </head>
 <body>
 
-    <pre id="resultDiv">Proving...</pre>
+    <textarea id="inputTextArea" style="width: 100%; height: 15em;">
+description = 'PROVE: { P → Q, R → Q } ⊢ { (P ∨ R) → Q }'
+logic = 'PropositionalLogic'
+vars = 'P,Q,R'
+premise1 = 'P → Q'
+premise2 = 'R → Q'
+conclusion = '(P ∨ R) → Q'
+debug = true
+    </textarea>
 
-    <script src="kotlin-kotlin-stdlib-js-ir.js"></script>
-    <script src="kotlin_org_jetbrains_kotlin_kotlin_dom_api_compat.js"></script>
-    <script src="GrahamPriestDeduction-target-js.js"></script>
+    <button id="proveButton">PROVE!</button>
 
+    <pre id="resultArea"></pre>
+
+    <script src="target-js.js"></script>
+
+</body>
 </html>

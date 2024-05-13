@@ -1,10 +1,20 @@
-class Theory
+class Problem
 (
     val logic : ILogic,
     val premises : List<IFormula>,
     val conclusion : IFormula,
+    val description : String = "",
+    val debugMode : Boolean = true,
 )
 {
+    companion object
+    {
+        fun fromConfig(config : String) : Problem
+        {
+            return ConfigParser.parse(config)
+        }
+    }
+
     fun prove() : ProofTree
     {
         val proofTree = buildInitialProofTree()
@@ -36,6 +46,8 @@ class Theory
             }
         }
 
+        logic.clearCache()
+
         return proofTree
     }
 
@@ -47,7 +59,8 @@ class Theory
 
         if (premises.isEmpty())
         {
-            val tree = ProofTree(ProofTreeNode(--id, nonConclusion))
+            val rootNode = ProofTreeNode(--id, nonConclusion)
+            val tree = ProofTree(rootNode, debugMode)
             tree.attachNodeFactory(ProofTreeNodeFactory(tree))
             return tree
         }
@@ -64,7 +77,7 @@ class Theory
 
         node.left = ProofTreeNode(--id, nonConclusion)
 
-        val tree = ProofTree(rootNode)
+        val tree = ProofTree(rootNode, debugMode)
         tree.attachNodeFactory(ProofTreeNodeFactory(tree))
         return tree
     }

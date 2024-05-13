@@ -15,7 +15,7 @@ kotlin {
 
     sourceSets {
         wasmMain {
-            kotlin.srcDirs = ['./src', '../src']
+            kotlin.srcDirs = ['./src', '../src', '../parser/src']
             resources.srcDirs = ['./res']
         }
     }

@@ -1,6 +1,7 @@
 class ProofTree
 (
-    val rootNode : ProofTreeNode
+    val rootNode : ProofTreeNode,
+    val debugMode : Boolean = false,
 )
 {
     private var isProofCorrect = false
@@ -82,6 +83,7 @@ class ProofTree
 
         val formatOptions = ProofTreeNode.PrintAsSubtreeFormatOptions(
             shouldShowPossibleWorlds = getAllPossibleWorlds().size >= 2,
+            shouldAlwaysIncrementIndent = debugMode,
         )
 
         val stringBuilder = StringBuilder()
@@ -203,7 +205,7 @@ class ProofTreeNode
     class PrintAsSubtreeFormatOptions
     (
         val shouldShowPossibleWorlds : Boolean,
-        val shouldAlwaysIncrementIndent : Boolean = true,
+        val shouldAlwaysIncrementIndent : Boolean,
     )
 
     fun printAsSubtreeToStringBuilder(stringBuilder : StringBuilder, options : PrintAsSubtreeFormatOptions, indent : Int = 0)

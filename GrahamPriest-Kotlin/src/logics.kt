@@ -2,6 +2,7 @@ interface ILogic
 {
     fun getRules() : Array<IRule>
     fun isOperationAvailable(operation : Operation) : Boolean
+    fun clearCache()
 }
 
 private val BASIC_RULES = arrayOf(
@@ -32,6 +33,8 @@ class PropositionalLogic : ILogic
     {
         return operation in BASIC_OPERATIONS
     }
+
+    override fun clearCache() {}
 }
 
 class FirstOrderLogic : ILogic
@@ -46,26 +49,14 @@ class FirstOrderLogic : ILogic
     {
         return operation in BASIC_OPERATIONS || operation is Operation.ForAll || operation is Operation.Exists
     }
-}
 
-class ModalLogic(val type : ModalLogicType) : ILogic
-{
-    val previousResultsOfNecessaryRule = NecessaryRule.PreviousResults()
-
-    override fun getRules() : Array<IRule>
-    {
-        return arrayOf(*BASIC_RULES,
-            NotNecessaryRule(), NotPossibleRule(), NecessaryRule(), PossibleRule())
-    }
-
-    override fun isOperationAvailable(operation : Operation) : Boolean
-    {
-        return operation in BASIC_OPERATIONS || operation == Operation.Possible || operation == Operation.Necessary
-    }
+    override fun clearCache() {}
 }
 
 class FirstOrderModalLogic(val type : ModalLogicType) : ILogic
 {
+    val previousResultsOfNecessaryRule = NecessaryRule.PreviousResults()
+
     override fun getRules() : Array<IRule>
     {
         return arrayOf(*BASIC_RULES,
@@ -77,5 +68,10 @@ class FirstOrderModalLogic(val type : ModalLogicType) : ILogic
     {
         return operation in BASIC_OPERATIONS || operation == Operation.Possible || operation == Operation.Necessary
                 || operation is Operation.ForAll || operation is Operation.Exists
+    }
+
+    override fun clearCache()
+    {
+        previousResultsOfNecessaryRule.clear()
     }
 }

@@ -1,7 +1,6 @@
+fun log(logLine : String) = println(logLine)
 
 fun main()
 {
-    val logger = { logLine : String -> println(logLine) }
-
-    test(logger)
+    test(::log)
 }
