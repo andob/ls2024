@@ -36,10 +36,33 @@ echo <<<EOHTML
 </head>
 <body>
     Demo: $demoProblemsLinks
+    
     <textarea id="inputTextArea" style="width: 100%; height: 15em;">$input</textarea>
+    
+    <div id="operationButtonsContainer">
+        <button>~</button><button>&</button><button>∨</button>
+        <button>→</button><button>↔</button><button>□</button><button>◇</button>
+    </div>
+    
     <button id="proveButton">PROVE!</button>
+    
     <pre id="resultArea"></pre>
+    
     <script src="target-js.js"></script>
+    
+    <script>
+        let inputTextArea = document.getElementById('inputTextArea');
+        let operationButtons = Array.from(document.getElementById('operationButtonsContainer').children);
+        operationButtons.forEach(button => button.addEventListener('click', () =>
+        {
+            const position = inputTextArea.selectionStart;
+            const before = inputTextArea.value.substring(0, position);
+            const after = inputTextArea.value.substring(position, inputTextArea.value.length);
+            inputTextArea.value = before + button.textContent + after;
+            inputTextArea.selectionStart = inputTextArea.selectionEnd = position + button.textContent.length;
+            inputTextArea.focus();
+        }));
+    </script>
 </body>
 </html>
 EOHTML;
