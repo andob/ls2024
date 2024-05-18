@@ -2,12 +2,11 @@ open class Operation(val sign : Char, val isUnary : Boolean, val isModal : Boole
 {
     companion object
     {
-        //todo modify notations
-        val Non = Operation(sign = '~', isUnary = true, isModal = false)
-        val And = Operation(sign = '&', isUnary = false, isModal = false)
+        val Non = Operation(sign = '¬', isUnary = true, isModal = false)
+        val And = Operation(sign = '∧', isUnary = false, isModal = false)
         val Or = Operation(sign = '∨', isUnary = false, isModal = false)
-        val Imply = Operation(sign = '→', isUnary = false, isModal = false)
-        val BiImply = Operation(sign = '↔', isUnary = false, isModal = false)
+        val Imply = Operation(sign = '⊃', isUnary = false, isModal = false)
+        val BiImply = Operation(sign = '≡', isUnary = false, isModal = false)
         val Necessary = Operation(sign = '□', isUnary = true, isModal = true)
         val Possible = Operation(sign = '◇', isUnary = true, isModal = true)
     }

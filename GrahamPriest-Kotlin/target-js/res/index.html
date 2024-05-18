@@ -7,12 +7,12 @@
 <body>
 
     <textarea id="inputTextArea" style="width: 100%; height: 15em;">
-description = 'PROVE: { P → Q, R → Q } ⊢ { (P ∨ R) → Q }'
+description = 'PROVE: { P ⊃ Q, R ⊃ Q } ⊢ { (P ∨ R) ⊃ Q }'
 logic = 'PropositionalLogic'
 vars = 'P,Q,R'
-premise1 = 'P → Q'
-premise2 = 'R → Q'
-conclusion = '(P ∨ R) → Q'
+premise1 = 'P ⊃ Q'
+premise2 = 'R ⊃ Q'
+conclusion = '(P ∨ R) ⊃ Q'
     </textarea>
 
     <button id="proveButton">PROVE!</button>

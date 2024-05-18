@@ -19,7 +19,7 @@ enum class TokenType(
         { value, _ -> Variable(Token(this, value)) }
     ),
     NOT(
-        Regex("""(¬)|(!)|(~)|(\bl?not\b)|(\\l?not\b)"""),
+        Regex("""(¬)|(!)|(¬)|(\bl?not\b)|(\\l?not\b)"""),
         TokenCategory.OP_UNARY_RIGHT,
         { value, args -> Not(Token(this, value), args[0]) },
         OperatorPrecedence.HIGHEST
@@ -61,13 +61,13 @@ enum class TokenType(
 //        OperatorPrecedence.HIGH
 //    ),
     IMPLIES(
-        Regex("""(=?⇒)|(→)|(\bimplies\b)|(\\implies\b)"""),
+        Regex("""(=?⇒)|(⊃)|(\bimplies\b)|(\\implies\b)"""),
         TokenCategory.OP_BINARY_INFIX,
         { value, args -> Implies(Token(this, value), args[0], args[1]) },
         OperatorPrecedence.MEDIUM
     ),
     IFF(
-        Regex("""(⇔)|(↔)|(\bl?iff\b)|(\\l?iff\b)"""),
+        Regex("""(⇔)|(≡)|(\bl?iff\b)|(\\l?iff\b)"""),
         TokenCategory.OP_BINARY_INFIX,
         { value, args -> IfAndOnlyIf(Token(this, value), args[0], args[1]) },
         OperatorPrecedence.LOW

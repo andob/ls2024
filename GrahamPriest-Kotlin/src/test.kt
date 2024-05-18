@@ -6,7 +6,7 @@ fun test(log : (String) -> Unit)
         ::exModal1, ::exModal2, ::exModal3,
         ::exPred1, ::exPred2, ::exPred3, ::exPred4,
         ::exModal4, ::exModal5, ::exModal6,
-        ::exModal7, ::exModal8, ::exModal9,
+        ::exModal7, ::exModal8,
     )
 
     for (function in functions)
@@ -16,12 +16,12 @@ fun test(log : (String) -> Unit)
 private fun testConfig(log : (String) -> Unit)
 {
     val configString = """
-        description = 'PROVE: { P → Q, R → Q } ⊢ { (P ∨ R) → Q }'
+        description = 'PROVE: { P ⊃ Q, R ⊃ Q } ⊢ { (P ∨ R) ⊃ Q }'
         logic = 'PropositionalLogic'
         vars = 'P,Q,R'
-        premise1 = 'P → Q'
-        premise2 = 'R → Q'
-        conclusion = '(P ∨ R) → Q'
+        premise1 = 'P ⊃ Q'
+        premise2 = 'R ⊃ Q'
+        conclusion = '(P ∨ R) ⊃ Q'
     """
 
     val problem = Problem.fromConfig(configString)
@@ -31,7 +31,7 @@ private fun testConfig(log : (String) -> Unit)
 
 private fun exProp1(log : (String) -> Unit)
 {
-    // { P → Q, R → Q } ⊢ { (P ∨ R) → Q }
+    // { P ⊃ Q, R ⊃ Q } ⊢ { (P ∨ R) ⊃ Q }
     val logic = PropositionalLogic()
     val formulaFactory = FormulaFactory(logic)
     val P = formulaFactory.newAtom("P")
@@ -47,7 +47,7 @@ private fun exProp1(log : (String) -> Unit)
 
 private fun exProp2(log : (String) -> Unit)
 {
-    // { P → (Q ∨ R), P & ~R } ⊢ { Q }
+    // { P ⊃ (Q ∨ R), P ∧ ¬R } ⊢ { Q }
     val logic = PropositionalLogic()
     val formulaFactory = FormulaFactory(logic)
     val P = formulaFactory.newAtom("P")
@@ -62,7 +62,7 @@ private fun exProp2(log : (String) -> Unit)
 
 private fun exProp3(log : (String) -> Unit)
 {
-    // { P ∨ (Q & R) } ⊢ { (P ∨ Q) & (P ∨ R) }
+    // { P ∨ (Q ∧ R) } ⊢ { (P ∨ Q) ∧ (P ∨ R) }
     val logic = PropositionalLogic()
     val formulaFactory = FormulaFactory(logic)
     val P = formulaFactory.newAtom("P")
@@ -77,7 +77,7 @@ private fun exProp3(log : (String) -> Unit)
 
 private fun exModal1(log : (String) -> Unit)
 {
-    // ⊢ₖ { ◇P ↔ ~□~P }
+    // ⊢ₖ { ◇P ≡ ¬□¬P }
     val logic = FirstOrderModalLogic(ModalLogicType.K)
     val formulaFactory = FormulaFactory(logic)
     val P = formulaFactory.newAtom("P")
@@ -91,7 +91,7 @@ private fun exModal1(log : (String) -> Unit)
 
 private fun exModal2(log : (String) -> Unit)
 {
-    // ⊢ₖ { ◇(P ∨ Q) → (◇P ∨ ◇Q) }
+    // ⊢ₖ { ◇(P ∨ Q) ⊃ (◇P ∨ ◇Q) }
     val logic = FirstOrderModalLogic(ModalLogicType.K)
     val formulaFactory = FormulaFactory(logic)
     val P = formulaFactory.newAtom("P")
@@ -106,7 +106,7 @@ private fun exModal2(log : (String) -> Unit)
 
 private fun exModal3(log : (String) -> Unit)
 {
-    // { □(P → Q) } ⊢ₖ { ◇P → ◇Q }
+    // { □(P ⊃ Q) } ⊢ₖ { ◇P ⊃ ◇Q }
     val logic = FirstOrderModalLogic(ModalLogicType.K)
     val formulaFactory = FormulaFactory(logic)
     val P = formulaFactory.newAtom("P")
@@ -120,7 +120,7 @@ private fun exModal3(log : (String) -> Unit)
 
 private fun exModal4(log : (String) -> Unit)
 {
-    // { □(◇P & ◇Q) } ⊢ₖ { □◇Q }
+    // { □(◇P ∧ ◇Q) } ⊢ₖ { □◇Q }
     val logic = FirstOrderModalLogic(ModalLogicType.K)
     val formulaFactory = FormulaFactory(logic)
     val P = formulaFactory.newAtom("P")
@@ -135,7 +135,7 @@ private fun exModal4(log : (String) -> Unit)
 
 private fun exModal5(log : (String) -> Unit)
 {
-    // ⊢ᵦ { □P ∨ □Q } ↔ { □(□P ∨ □Q) }
+    // ⊢ᵦ { □P ∨ □Q } ≡ { □(□P ∨ □Q) }
     val logic = FirstOrderModalLogic(ModalLogicType.B)
     val formulaFactory = FormulaFactory(logic)
     val P = formulaFactory.newAtom("P")
@@ -151,7 +151,7 @@ private fun exModal5(log : (String) -> Unit)
 
 private fun exModal6(log : (String) -> Unit)
 {
-    // ⊢ₛ₅ ◇P → ◇◇P
+    // ⊢ₛ₅ ◇P ⊃ ◇◇P
     val logic = FirstOrderModalLogic(ModalLogicType.S5)
     val formulaFactory = FormulaFactory(logic)
     val P = formulaFactory.newAtom("P")
@@ -164,7 +164,7 @@ private fun exModal6(log : (String) -> Unit)
 
 private fun exModal7(log : (String) -> Unit)
 {
-    // ⊢ₛ₅ ◇P → □◇P
+    // ⊢ₛ₅ ◇P ⊃ □◇P
     val logic = FirstOrderModalLogic(ModalLogicType.S5)
     val formulaFactory = FormulaFactory(logic)
     val P = formulaFactory.newAtom("P")
@@ -177,7 +177,7 @@ private fun exModal7(log : (String) -> Unit)
 
 private fun exModal8(log : (String) -> Unit)
 {
-    // ⊢ₛ₅ □(□P → □Q) ∨ □(□Q → □P)
+    // ⊢ₛ₅ □(□P ⊃ □Q) ∨ □(□Q ⊃ □P)
     val logic = FirstOrderModalLogic(ModalLogicType.S5)
     val formulaFactory = FormulaFactory(logic)
     val P = formulaFactory.newAtom("P")
@@ -187,22 +187,6 @@ private fun exModal8(log : (String) -> Unit)
         formulaFactory.new(formulaFactory.new(Operation.Necessary, P), Operation.Imply, formulaFactory.new(Operation.Necessary, Q))),
         Operation.Or, formulaFactory.new(Operation.Necessary,
         formulaFactory.new(formulaFactory.new(Operation.Necessary, Q), Operation.Imply, formulaFactory.new(Operation.Necessary, P))))
-    val proof = Problem(logic, listOf(), statement).prove()
-    log("PROVE: ⊢ₛ₅ { $statement }\n$proof\n\n")
-}
-
-private fun exModal9(log : (String) -> Unit)
-{
-    // ⊢ₛ₅ □(◇P → Q) ↔ □(P → □Q)
-    val logic = FirstOrderModalLogic(ModalLogicType.S5)
-    val formulaFactory = FormulaFactory(logic)
-    val P = formulaFactory.newAtom("P")
-    val Q = formulaFactory.newAtom("Q")
-
-    val statement = formulaFactory.new(formulaFactory.new(Operation.Necessary,
-        formulaFactory.new(formulaFactory.new(Operation.Possible, P), Operation.Imply, Q)),
-        Operation.BiImply, formulaFactory.new(Operation.Necessary,
-        formulaFactory.new(P, Operation.Imply, formulaFactory.new(Operation.Necessary, Q))))
     val proof = Problem(logic, listOf(), statement).prove()
     log("PROVE: ⊢ₛ₅ { $statement }\n$proof\n\n")
 }
@@ -226,7 +210,7 @@ private fun exPred1(log : (String) -> Unit)
 
 private fun exPred2(log : (String) -> Unit)
 {
-    // { ∀x(Px → ∃y.Sxy) } ⊢ { ∀x.∃y(Px → Sxy ) }
+    // { ∀x(Px ⊃ ∃y.Sxy) } ⊢ { ∀x.∃y(Px ⊃ Sxy ) }
     val logic = FirstOrderLogic()
     val formulaFactory = FormulaFactory(logic)
     val x = formulaFactory.newBindingVariable("x")
@@ -242,7 +226,7 @@ private fun exPred2(log : (String) -> Unit)
 
 private fun exPred3(log : (String) -> Unit)
 {
-    // { ∃x.~∃y.Sxy } ⊢ { ~∃x.∀y.Sxy }
+    // { ∃x.¬∃y.Sxy } ⊢ { ¬∃x.∀y.Sxy }
     val logic = FirstOrderLogic()
     val formulaFactory = FormulaFactory(logic)
     val x = formulaFactory.newBindingVariable("x")
@@ -257,7 +241,7 @@ private fun exPred3(log : (String) -> Unit)
 
 private fun exPred4(log : (String) -> Unit)
 {
-    // ⊢ { ∃x.∃y.Pxy ↔ ∃x.∃y.Pyx }
+    // ⊢ { ∃x.∃y.Pxy ≡ ∃x.∃y.Pyx }
     val logic = FirstOrderLogic()
     val formulaFactory = FormulaFactory(logic)
     val x = formulaFactory.newBindingVariable("x")

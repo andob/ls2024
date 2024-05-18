@@ -14,13 +14,13 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
         {
             /*  P*/ targetNode.formula is AtomicFormula -> Pair(targetNode.formula, true)
 
-            /* ~P*/ targetNode.formula is ComplexFormula && targetNode.formula.operation == Operation.Non &&
+            /* ¬P*/ targetNode.formula is ComplexFormula && targetNode.formula.operation == Operation.Non &&
                     targetNode.formula.x is AtomicFormula -> Pair(targetNode.formula.x, false)
 
             /* ◇P*/ targetNode.formula is ComplexFormula && targetNode.formula.operation.isModal &&
                     targetNode.formula.x is AtomicFormula -> Pair(targetNode.formula, true)
 
-            /*~◇P*/ targetNode.formula is ComplexFormula && targetNode.formula.operation == Operation.Non &&
+            /*¬◇P*/ targetNode.formula is ComplexFormula && targetNode.formula.operation == Operation.Non &&
                     targetNode.formula.x is ComplexFormula && targetNode.formula.x.operation.isModal &&
                     targetNode.formula.x.x is AtomicFormula -> Pair(targetNode.formula.x, false)
 
