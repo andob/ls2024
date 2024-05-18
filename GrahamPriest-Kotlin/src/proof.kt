@@ -4,7 +4,6 @@ class Problem
     val premises : List<IFormula>,
     val conclusion : IFormula,
     val description : String = "",
-    val debugMode : Boolean = true,
 )
 {
     companion object
@@ -46,6 +45,8 @@ class Problem
             }
         }
 
+        proofTree.hasTimeout = !proofTree.nodeIdSequence.hasNext()
+
         logic.clearCache()
 
         return proofTree
@@ -60,7 +61,7 @@ class Problem
         if (premises.isEmpty())
         {
             val rootNode = ProofTreeNode(--id, nonConclusion)
-            val tree = ProofTree(rootNode, debugMode)
+            val tree = ProofTree(problem = this, rootNode)
             tree.attachNodeFactory(ProofTreeNodeFactory(tree))
             return tree
         }
@@ -77,7 +78,7 @@ class Problem
 
         node.left = ProofTreeNode(--id, nonConclusion)
 
-        val tree = ProofTree(rootNode, debugMode)
+        val tree = ProofTree(problem = this, rootNode)
         tree.attachNodeFactory(ProofTreeNodeFactory(tree))
         return tree
     }

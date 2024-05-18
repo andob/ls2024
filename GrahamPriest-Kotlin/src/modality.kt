@@ -24,6 +24,7 @@ enum class ModalLogicType
     S5(isReflexive = true, isSymmetric = true, isTransitive = true, isExtendable = false),
 }
 
+//todo de implementat temporalitatea
 class NotPossibleRule : IRule
 {
     override fun isApplicable(node : ProofTreeNode) : Boolean

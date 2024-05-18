@@ -1,10 +1,11 @@
 class ProofTree
 (
+    val problem : Problem,
     val rootNode : ProofTreeNode,
-    val debugMode : Boolean = false,
 )
 {
-    private var isProofCorrect = false
+    var isProofCorrect = false
+    var hasTimeout = false
 
     val nodeIdSequence = object : Iterator<Long>
     {
@@ -47,9 +48,12 @@ class ProofTree
 
     fun getAllLeafs() : List<ProofTreeNode>
     {
-        val leafs = mutableListOf<ProofTreeNode>()
-        this.rootNode.findAllLeafs(leafs)
-        return leafs
+        return getAllLeafsWithPaths().map { (node, path) -> node }
+    }
+
+    fun getAllPaths() : List<ProofTreePath>
+    {
+        return getAllLeafsWithPaths().map { (node, path) -> path }
     }
 
     fun getAllLeafsWithPaths() : List<Pair<ProofTreeNode, ProofTreePath>>
@@ -77,19 +81,39 @@ class ProofTree
         return getAllLeafsWithPaths().flatMap { (_, path) -> path.getAllPossibleWorlds() }.distinct().sortedDescending()
     }
 
-    override fun toString() : String
+    fun toStringPair() : Pair<String, String>
     {
-        val isProvedStr = if (this.isProofCorrect) "PROVED!" else "NOT PROVED!"
+        val isProved = if (hasTimeout) "TIMEOUT!" else if (isProofCorrect) "PROVED!" else "NOT PROVED!"
+
+        val counterexample = if (hasTimeout || isProofCorrect) "" else
+        {
+            val formulaFilter = { formula : IFormula ->
+                formula is AtomicFormula ||
+                (formula is ComplexFormula && formula.operation == Operation.Non && formula.x is AtomicFormula) ||
+                (formula is ComplexFormula && formula.operation.isModal && formula.x is AtomicFormula) ||
+                (formula is ComplexFormula && formula.operation == Operation.Non && formula.x is ComplexFormula
+                    && formula.x.operation.isModal && formula.x.x is AtomicFormula)
+            }
+
+            "COUNTEREXAMPLE: " + getAllPaths().find { !it.isContradictory() }?.getAllFormulas()
+                ?.filter(formulaFilter)?.joinToString(separator = " -> ")
+        }
+
+        val textResult = "${problem.description}\n$isProved\n$counterexample"
 
         val formatOptions = ProofTreeNode.PrintAsSubtreeFormatOptions(
             shouldShowPossibleWorlds = getAllPossibleWorlds().size >= 2,
-            shouldAlwaysIncrementIndent = debugMode,
-        )
+            shouldAlwaysIncrementIndent = true)
 
-        val stringBuilder = StringBuilder()
-        stringBuilder.append(isProvedStr).append('\n')
-        this.rootNode.printAsSubtreeToStringBuilder(stringBuilder, formatOptions)
-        return stringBuilder.toString()
+        val treeResultStringBuilder = StringBuilder()
+        this.rootNode.printAsSubtreeToStringBuilder(treeResultStringBuilder, formatOptions)
+        return Pair(textResult.trim(), treeResultStringBuilder.toString().trim())
+    }
+
+    override fun toString() : String
+    {
+        val (textResult, treeResult) = toStringPair()
+        return "$textResult\n$treeResult"
     }
 }
 

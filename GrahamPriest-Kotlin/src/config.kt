@@ -15,7 +15,6 @@ object ConfigParser
         val variableNames = data["vars"]?.split(",")?.map { it.trim() } ?: throw missing("vars")
         val premisesAsStrings = data.keys.filter { it.startsWith("premise") }.sorted().map { data[it]!!.trim() }
         val conclusionAsString = data["conclusion"]?.trim()?.ifEmpty { null } ?: throw missing("conclusion")
-        val debugMode = data["debug"] == true.toString()
 
         val logic = when(logicName)
         {
@@ -37,7 +36,7 @@ object ConfigParser
         val premises = premisesAsStrings.map { premise -> converter.convert(premise) }
         val conclusion = converter.convert(conclusionAsString)
 
-        return Problem(logic, premises, conclusion, description, debugMode)
+        return Problem(logic, premises, conclusion, description)
     }
 
     private class StatementToFormulaConverter

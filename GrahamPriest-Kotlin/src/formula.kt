@@ -2,6 +2,7 @@ open class Operation(val sign : Char, val isUnary : Boolean, val isModal : Boole
 {
     companion object
     {
+        //todo modify notations
         val Non = Operation(sign = '~', isUnary = true, isModal = false)
         val And = Operation(sign = '&', isUnary = false, isModal = false)
         val Or = Operation(sign = '∨', isUnary = false, isModal = false)
