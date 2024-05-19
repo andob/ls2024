@@ -10,7 +10,7 @@ object ConfigParser
             .associate { tokens -> Pair(tokens[0], tokens[1].trim('\'')) }
 
         fun missing(what : String) = RuntimeException("Cannot parse input! Missing $what!")
-        val description = data["description"] ?: throw missing("description")
+        val description = data["description"] ?: ""
         val logicName = data["logic"] ?: throw missing("logic")
         val variableNames = data["vars"]?.split(",")?.map { it.trim() } ?: throw missing("vars")
         val premisesAsStrings = data.keys.filter { it.startsWith("premise") }.sorted().map { data[it]!!.trim() }
@@ -26,6 +26,7 @@ object ConfigParser
             "BModalLogic" -> FirstOrderModalLogic(ModalLogicType.B)
             "S4ModalLogic" -> FirstOrderModalLogic(ModalLogicType.S4)
             "S5ModalLogic" -> FirstOrderModalLogic(ModalLogicType.S5)
+            "KTemporalModalLogic" -> FirstOrderModalLogic(ModalLogicType.Kᵗ)
             else -> throw RuntimeException("Invalid logic $logicName")
         }
 
@@ -54,16 +55,23 @@ object ConfigParser
 
         fun convertNode(node : Node) : IFormula
         {
-            return when(node)
+            return when
             {
-                is Variable -> findAtomicFormula(node)
-                is Not -> formulaFactory.new(Operation.Non, convertNode(node.arg))
-                is And -> formulaFactory.new(convertNode(node.left), Operation.And, convertNode(node.right))
-                is Or -> formulaFactory.new(convertNode(node.left), Operation.Or, convertNode(node.right))
-                is Implies -> formulaFactory.new(convertNode(node.left), Operation.Imply, convertNode(node.right))
-                is IfAndOnlyIf -> formulaFactory.new(convertNode(node.left), Operation.BiImply, convertNode(node.right))
-                is Necessary -> formulaFactory.new(Operation.Necessary, convertNode(node.arg))
-                is Possible -> formulaFactory.new(Operation.Possible, convertNode(node.arg))
+                node is Variable -> findAtomicFormula(node)
+                node is Not -> formulaFactory.new(Operation.Non, convertNode(node.arg))
+                node is And -> formulaFactory.new(convertNode(node.left), Operation.And, convertNode(node.right))
+                node is Or -> formulaFactory.new(convertNode(node.left), Operation.Or, convertNode(node.right))
+                node is Implies -> formulaFactory.new(convertNode(node.left), Operation.Imply, convertNode(node.right))
+                node is IfAndOnlyIf -> formulaFactory.new(convertNode(node.left), Operation.BiImply, convertNode(node.right))
+
+                node is Necessary && node.arg is Past -> formulaFactory.new(Operation.Necessary(isInverted = true, subscript = "⤵"), convertNode(node.arg.arg))
+                node is Necessary && node.arg is Future -> formulaFactory.new(Operation.Necessary(subscript = "⤴"), convertNode(node.arg.arg))
+                node is Necessary -> formulaFactory.new(Operation.Necessary(), convertNode(node.arg))
+
+                node is Possible && node.arg is Past -> formulaFactory.new(Operation.Possible(isInverted = true, subscript = "⤵"), convertNode(node.arg.arg))
+                node is Possible && node.arg is Future -> formulaFactory.new(Operation.Possible(subscript = "⤴"), convertNode(node.arg.arg))
+                node is Possible -> formulaFactory.new(Operation.Possible(), convertNode(node.arg))
+
                 else -> throw RuntimeException("Invalid node $node")
             }
         }

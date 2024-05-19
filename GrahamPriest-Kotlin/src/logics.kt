@@ -66,7 +66,8 @@ class FirstOrderModalLogic(val type : ModalLogicType) : ILogic
 
     override fun isOperationAvailable(operation : Operation) : Boolean
     {
-        return operation in BASIC_OPERATIONS || operation == Operation.Possible || operation == Operation.Necessary
+        return operation in BASIC_OPERATIONS
+                || operation is Operation.Possible || operation is Operation.Necessary
                 || operation is Operation.ForAll || operation is Operation.Exists
     }
 

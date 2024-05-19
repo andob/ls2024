@@ -17,11 +17,11 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
             /* ¬P*/ targetNode.formula is ComplexFormula && targetNode.formula.operation == Operation.Non &&
                     targetNode.formula.x is AtomicFormula -> Pair(targetNode.formula.x, false)
 
-            /* ◇P*/ targetNode.formula is ComplexFormula && targetNode.formula.operation.isModal &&
+            /* ◇P*/ targetNode.formula is ComplexFormula && targetNode.formula.operation is ModalOperation &&
                     targetNode.formula.x is AtomicFormula -> Pair(targetNode.formula, true)
 
             /*¬◇P*/ targetNode.formula is ComplexFormula && targetNode.formula.operation == Operation.Non &&
-                    targetNode.formula.x is ComplexFormula && targetNode.formula.x.operation.isModal &&
+                    targetNode.formula.x is ComplexFormula && targetNode.formula.x.operation is ModalOperation &&
                     targetNode.formula.x.x is AtomicFormula -> Pair(targetNode.formula.x, false)
 
             else -> return false //tree is not yet completely expanded here
@@ -41,8 +41,8 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
                 }
 
                 if (node.formula is ComplexFormula && node.formula.operation == Operation.Non &&
-                    node.formula.x is ComplexFormula && node.formula.x.operation.isModal &&
-                    targetFormula is ComplexFormula && targetFormula.operation.isModal &&
+                    node.formula.x is ComplexFormula && node.formula.x.operation is ModalOperation &&
+                    targetFormula is ComplexFormula && targetFormula.operation is ModalOperation &&
                     node.formula.x.x is AtomicFormula && targetFormula.x is AtomicFormula &&
                     node.formula.x.x.isReplaceableWith(targetFormula.x))
                 {
@@ -62,9 +62,9 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
                     return true
                 }
 
-                if (node.formula is ComplexFormula && node.formula.operation.isModal &&
+                if (node.formula is ComplexFormula && node.formula.operation is ModalOperation &&
                     targetFormula is ComplexFormula && targetFormula.operation == Operation.Non &&
-                    targetFormula.x is ComplexFormula && targetFormula.x.operation.isModal &&
+                    targetFormula.x is ComplexFormula && targetFormula.x.operation is ModalOperation &&
                     node.formula.x is AtomicFormula && targetFormula.x.x is AtomicFormula &&
                     node.formula.x.isReplaceableWith(targetFormula.x.x))
                 {

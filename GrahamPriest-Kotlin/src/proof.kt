@@ -54,7 +54,7 @@ class Problem
 
     private fun buildInitialProofTree() : ProofTree
     {
-        var id = 0L
+        var id = 0
         val formulaFactory = conclusion.formulaFactory
         val nonConclusion = formulaFactory.new(Operation.Non, conclusion)
 
@@ -153,7 +153,7 @@ class DecompositionPriorityQueue
     {
         return when
         {
-            node.formula is ComplexFormula && node.formula.operation == Operation.Necessary -> Priority.Low
+            node.formula is ComplexFormula && node.formula.operation is Operation.Necessary -> Priority.Low
             else -> Priority.Normal
         }
     }
@@ -163,7 +163,7 @@ class DecompositionPriorityQueue
         return when
         {
             bannedReusableNodes.contains(node) -> false
-            node.formula is ComplexFormula && node.formula.operation == Operation.Necessary -> true
+            node.formula is ComplexFormula && node.formula.operation is Operation.Necessary -> true
             else -> false
         }
     }

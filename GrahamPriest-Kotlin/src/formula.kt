@@ -1,33 +1,39 @@
-open class Operation(val sign : Char, val isUnary : Boolean, val isModal : Boolean)
+open class Operation(val sign : Char)
 {
     companion object
     {
-        val Non = Operation(sign = '¬', isUnary = true, isModal = false)
-        val And = Operation(sign = '∧', isUnary = false, isModal = false)
-        val Or = Operation(sign = '∨', isUnary = false, isModal = false)
-        val Imply = Operation(sign = '⊃', isUnary = false, isModal = false)
-        val BiImply = Operation(sign = '≡', isUnary = false, isModal = false)
-        val Necessary = Operation(sign = '□', isUnary = true, isModal = true)
-        val Possible = Operation(sign = '◇', isUnary = true, isModal = true)
+        val Non = UnaryOperation(sign = '¬')
+        val And = Operation(sign = '∧')
+        val Or = Operation(sign = '∨')
+        val Imply = Operation(sign = '⊃')
+        val BiImply = Operation(sign = '≡')
     }
+
+    class Necessary(isInverted : Boolean = false, subscript : String = "") : ModalOperation(sign = '□', isInverted, subscript)
+    class Possible(isInverted : Boolean = false, subscript : String = "") : ModalOperation(sign = '◇', isInverted, subscript)
+
+    class ForAll(x : BindingPredicateArgument) : QuantifierOperation(sign = '∀', x)
+    class Exists(x : BindingPredicateArgument) : QuantifierOperation(sign = '∃', x)
 
     override fun equals(other : Any?) = (other as? Operation)?.sign==sign
     override fun hashCode() = sign.hashCode()
     override fun toString() = sign.toString()
+}
 
-    class ForAll(val x : BindingPredicateArgument) : Operation(sign = '∀', isUnary = true, isModal = false)
-    {
-        override fun equals(other : Any?) = super.equals(other) && (other as? ForAll)?.x==x
-        override fun hashCode() = hash(sign, x)
-        override fun toString() = "$sign$x"
-    }
+open class UnaryOperation(sign : Char) : Operation(sign)
 
-    class Exists(val x : BindingPredicateArgument) : Operation(sign = '∃', isUnary = true, isModal = false)
-    {
-        override fun equals(other : Any?) = super.equals(other) && (other as? Exists)?.x==x
-        override fun hashCode() = hash(sign, x)
-        override fun toString() = "$sign$x"
-    }
+open class ModalOperation(sign : Char, val isInverted : Boolean, val subscript : String) : UnaryOperation(sign)
+{
+    override fun equals(other : Any?) = super.equals(other) && (other as? ModalOperation)?.isInverted==isInverted
+    override fun hashCode() = hash(sign, isInverted)
+    override fun toString() = "$sign$subscript"
+}
+
+open class QuantifierOperation(sign : Char, val x : BindingPredicateArgument) : UnaryOperation(sign)
+{
+    override fun equals(other : Any?) = super.equals(other) && (other as? QuantifierOperation)?.x==x
+    override fun hashCode() = hash(sign, x)
+    override fun toString() = "$sign$x"
 }
 
 interface IFormula
@@ -161,9 +167,9 @@ class ComplexFormula
 {
     init
     {
-        if (operation.isUnary && y != null)
+        if (operation is UnaryOperation && y != null)
             throw RuntimeException("$operation should use only one argument!")
-        if (!operation.isUnary && y == null)
+        if (operation !is UnaryOperation && y == null)
             throw RuntimeException("$operation should use two arguments!")
     }
 
@@ -179,7 +185,7 @@ class ComplexFormula
 
     override fun toString() : String
     {
-        val xString = if (x is ComplexFormula && !x.operation.isUnary) "($x)" else "$x"
+        val xString = if (x is ComplexFormula && x.operation !is UnaryOperation) "($x)" else "$x"
 
         if (y == null)
         {
@@ -188,7 +194,7 @@ class ComplexFormula
         }
 
         //this is a binary formula
-        val yString = if (y is ComplexFormula && !y.operation.isUnary) "($y)" else "$y"
+        val yString = if (y is ComplexFormula && y.operation !is UnaryOperation) "($y)" else "$y"
         return "$xString $operation $yString"
     }
 }

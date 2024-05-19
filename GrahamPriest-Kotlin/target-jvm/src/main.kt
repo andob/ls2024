@@ -1,6 +1,15 @@
 fun log(logLine : String) = println(logLine)
 
-fun main()
+fun main(args : Array<String>)
 {
-    test(::log)
+    if (args.isEmpty())
+    {
+        test(::log)
+    }
+    else
+    {
+        val problem = Problem.fromConfig(args.joinToString(separator = "\n"))
+        val proof = problem.prove()
+        log(proof.toString())
+    }
 }

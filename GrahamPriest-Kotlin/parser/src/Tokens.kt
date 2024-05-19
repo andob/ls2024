@@ -36,6 +36,18 @@ enum class TokenType(
         { value, args -> Necessary(Token(this, value), args[0]) },
         OperatorPrecedence.HIGHEST
     ),
+    FUTURE(
+        Regex("""(⤴)|(\bl?future\b)|(\\l?future\b)"""),
+        TokenCategory.OP_UNARY_RIGHT,
+        { value, args -> Future(Token(this, value), args[0]) },
+        OperatorPrecedence.HIGHEST
+    ),
+    PAST(
+        Regex("""(⤵)|(\bl?past\b)|(\\l?past\b)"""),
+        TokenCategory.OP_UNARY_RIGHT,
+        { value, args -> Past(Token(this, value), args[0]) },
+        OperatorPrecedence.HIGHEST
+    ),
     AND(
         Regex("""(∧)|(&&)|(&)|(\bl?and\b)|(\\l?and\b)"""),
         TokenCategory.OP_BINARY_INFIX,

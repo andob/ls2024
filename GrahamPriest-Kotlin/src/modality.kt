@@ -14,29 +14,32 @@ enum class ModalLogicType
     val isSymmetric : Boolean, //σ
     val isTransitive : Boolean, //τ
     val isExtendable : Boolean, //η
+    val isTemporal : Boolean,
 )
 {
-    K(isReflexive = false, isSymmetric = false, isTransitive = false, isExtendable = false),
-    T(isReflexive = true, isSymmetric = false, isTransitive = false, isExtendable = false),
-    D(isReflexive = false, isSymmetric = false, isTransitive = false, isExtendable = true),
-    B(isReflexive = true, isSymmetric = true, isTransitive = false, isExtendable = false),
-    S4(isReflexive = true, isSymmetric = false, isTransitive = true, isExtendable = false),
-    S5(isReflexive = true, isSymmetric = true, isTransitive = true, isExtendable = false),
+    K(isReflexive = false, isSymmetric = false, isTransitive = false, isExtendable = false, isTemporal = false),
+    Kᵗ(isReflexive = false, isSymmetric = false, isTransitive = false, isExtendable = false, isTemporal = true),
+    T(isReflexive = true, isSymmetric = false, isTransitive = false, isExtendable = false, isTemporal = false),
+    D(isReflexive = false, isSymmetric = false, isTransitive = false, isExtendable = true, isTemporal = false),
+    B(isReflexive = true, isSymmetric = true, isTransitive = false, isExtendable = false, isTemporal = false),
+    S4(isReflexive = true, isSymmetric = false, isTransitive = true, isExtendable = false, isTemporal = false),
+    S5(isReflexive = true, isSymmetric = true, isTransitive = true, isExtendable = false, isTemporal = false),
 }
 
-//todo de implementat temporalitatea
 class NotPossibleRule : IRule
 {
     override fun isApplicable(node : ProofTreeNode) : Boolean
     {
         return (node.formula as? ComplexFormula)?.operation == Operation.Non &&
-                ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.Possible
+                ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation is Operation.Possible
     }
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         val p = ((node.formula as ComplexFormula).x as ComplexFormula).x
-        val necessaryNonP = factory.newFormula(Operation.Necessary, factory.newFormula(Operation.Non, p))
+        val possibleP = (node.formula.x as ComplexFormula).operation as Operation.Possible
+        val necessary = Operation.Necessary(possibleP.isInverted, possibleP.subscript)
+        val necessaryNonP = factory.newFormula(necessary, factory.newFormula(Operation.Non, p))
         return ProofSubtree(left = factory.newNode(necessaryNonP))
     }
 }
@@ -46,13 +49,15 @@ class NotNecessaryRule : IRule
     override fun isApplicable(node : ProofTreeNode) : Boolean
     {
         return (node.formula as? ComplexFormula)?.operation == Operation.Non &&
-                ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.Necessary
+                ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation is Operation.Necessary
     }
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         val p = ((node.formula as ComplexFormula).x as ComplexFormula).x
-        val possibleNonP = factory.newFormula(Operation.Possible, factory.newFormula(Operation.Non, p))
+        val necessaryP = (node.formula.x as ComplexFormula).operation as Operation.Necessary
+        val possible = Operation.Possible(necessaryP.isInverted, necessaryP.subscript)
+        val possibleNonP = factory.newFormula(possible, factory.newFormula(Operation.Non, p))
         return ProofSubtree(left = factory.newNode(possibleNonP))
     }
 }
@@ -61,18 +66,25 @@ class PossibleRule : IRule
 {
     override fun isApplicable(node : ProofTreeNode) : Boolean
     {
-        return (node.formula as? ComplexFormula)?.operation == Operation.Possible
+        return (node.formula as? ComplexFormula)?.operation is Operation.Possible
     }
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
+        val modalLogic = factory.getLogic() as FirstOrderModalLogic
+        val originalSubFormula = (node.formula as ComplexFormula).x
+        val originalOperation = node.formula.operation as ModalOperation
+
         val path = node.getPathFromRootToLeafsThroughNode()
         val forkedWorld = path.nodes.maxOf { it.formula.possibleWorld }.fork()
 
-        val originalSubFormula = (node.formula as ComplexFormula).x
         val newNode = factory.newNode(originalSubFormula.inWorld(forkedWorld))
-        val newDescriptorNode = factory.newNode(factory.newModalRelationDescriptor(
-            fromWorld = node.formula.possibleWorld, toWorld = forkedWorld))
+
+        val modalRelationDescriptor = if (modalLogic.type.isTemporal && originalOperation.isInverted)
+            factory.newModalRelationDescriptor(fromWorld = forkedWorld, toWorld = node.formula.possibleWorld)
+        else factory.newModalRelationDescriptor(fromWorld = node.formula.possibleWorld, toWorld = forkedWorld)
+
+        val newDescriptorNode = factory.newNode(modalRelationDescriptor)
         newDescriptorNode.left = newNode
         return ProofSubtree(left = newDescriptorNode)
     }
@@ -82,16 +94,17 @@ class NecessaryRule : IRule
 {
     override fun isApplicable(node : ProofTreeNode) : Boolean
     {
-        return (node.formula as? ComplexFormula)?.operation == Operation.Necessary
+        return (node.formula as? ComplexFormula)?.operation is Operation.Necessary
     }
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         val modalLogic = factory.getLogic() as FirstOrderModalLogic
         val originalSubFormula = (node.formula as ComplexFormula).x
+        val originalOperation = node.formula.operation as Operation.Necessary
 
         val path = node.getPathFromRootToLeafsThroughNode()
-        val graph = buildNecessityGraph(modalLogic, path)
+        val graph = buildNecessityGraph(modalLogic, originalOperation, path)
 
         if (graph.vertices.isEmpty())
         {
@@ -123,13 +136,23 @@ class NecessaryRule : IRule
         return ProofSubtree.empty()
     }
 
-    private fun buildNecessityGraph(modalLogic : FirstOrderModalLogic, path : ProofTreePath) : Graph<PossibleWorld>
+    private fun buildNecessityGraph(modalLogic : FirstOrderModalLogic, operation : Operation.Necessary, path : ProofTreePath) : Graph<PossibleWorld>
     {
         val graph = Graph.withNodes(path.getAllPossibleWorlds())
 
         for (formula in path.getAllFormulas().filterIsInstance<ModalRelationDescriptorFormula>())
         {
             graph.addVertex(formula.fromWorld, formula.toWorld)
+        }
+
+        if (modalLogic.type.isTemporal && operation.isInverted)
+        {
+            graph.invertAllVertices()
+        }
+
+        if (modalLogic.type.isTemporal)
+        {
+            graph.addMissingTemporalConvergenceVertices()
         }
 
         if (modalLogic.type.isReflexive)

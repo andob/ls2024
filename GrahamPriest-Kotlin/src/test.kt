@@ -6,7 +6,7 @@ fun test(log : (String) -> Unit)
         ::exModal1, ::exModal2, ::exModal3,
         ::exPred1, ::exPred2, ::exPred3, ::exPred4,
         ::exModal4, ::exModal5, ::exModal6,
-        ::exModal7, ::exModal8,
+        ::exModal7, ::exModal8, ::exModal9,
     )
 
     for (function in functions)
@@ -16,7 +16,6 @@ fun test(log : (String) -> Unit)
 private fun testConfig(log : (String) -> Unit)
 {
     val configString = """
-        description = 'PROVE: { P ⊃ Q, R ⊃ Q } ⊢ { (P ∨ R) ⊃ Q }'
         logic = 'PropositionalLogic'
         vars = 'P,Q,R'
         premise1 = 'P ⊃ Q'
@@ -83,8 +82,8 @@ private fun exModal1(log : (String) -> Unit)
     val P = formulaFactory.newAtom("P")
 
     val statement = formulaFactory.new(
-        formulaFactory.new(Operation.Possible, P), Operation.BiImply,
-        formulaFactory.new(Operation.Non, formulaFactory.new(Operation.Necessary, formulaFactory.new(Operation.Non, P))))
+        formulaFactory.new(Operation.Possible(), P), Operation.BiImply,
+        formulaFactory.new(Operation.Non, formulaFactory.new(Operation.Necessary(), formulaFactory.new(Operation.Non, P))))
     val proof = Problem(logic, listOf(), statement).prove()
     log("PROVE: ⊢ₖ { $statement }\n$proof\n\n")
 }
@@ -98,8 +97,8 @@ private fun exModal2(log : (String) -> Unit)
     val Q = formulaFactory.newAtom("Q")
 
     val statement = formulaFactory.new(
-        formulaFactory.new(Operation.Possible, formulaFactory.new(P, Operation.Or, Q)), Operation.Imply,
-        formulaFactory.new(formulaFactory.new(Operation.Possible, P), Operation.Or, formulaFactory.new(Operation.Possible, Q)))
+        formulaFactory.new(Operation.Possible(), formulaFactory.new(P, Operation.Or, Q)), Operation.Imply,
+        formulaFactory.new(formulaFactory.new(Operation.Possible(), P), Operation.Or, formulaFactory.new(Operation.Possible(), Q)))
     val proof = Problem(logic, listOf(), statement).prove()
     log("PROVE: ⊢ₖ { $statement }\n$proof\n\n")
 }
@@ -112,8 +111,8 @@ private fun exModal3(log : (String) -> Unit)
     val P = formulaFactory.newAtom("P")
     val Q = formulaFactory.newAtom("Q")
 
-    val premise = formulaFactory.new(Operation.Necessary, formulaFactory.new(P, Operation.Imply, Q))
-    val conclusion = formulaFactory.new(formulaFactory.new(Operation.Possible, P), Operation.Imply, formulaFactory.new(Operation.Possible, Q))
+    val premise = formulaFactory.new(Operation.Necessary(), formulaFactory.new(P, Operation.Imply, Q))
+    val conclusion = formulaFactory.new(formulaFactory.new(Operation.Possible(), P), Operation.Imply, formulaFactory.new(Operation.Possible(), Q))
     val proof = Problem(logic, listOf(premise), conclusion).prove()
     log("PROVE: { $premise } ⊢ₖ { $conclusion }\n$proof\n\n")
 }
@@ -126,9 +125,9 @@ private fun exModal4(log : (String) -> Unit)
     val P = formulaFactory.newAtom("P")
     val Q = formulaFactory.newAtom("Q")
 
-    val premise = formulaFactory.new(Operation.Necessary, formulaFactory.new(
-        formulaFactory.new(Operation.Possible, P), Operation.And, formulaFactory.new(Operation.Possible, Q)))
-    val conclusion = formulaFactory.new(Operation.Necessary, formulaFactory.new(Operation.Possible, Q))
+    val premise = formulaFactory.new(Operation.Necessary(), formulaFactory.new(
+        formulaFactory.new(Operation.Possible(), P), Operation.And, formulaFactory.new(Operation.Possible(), Q)))
+    val conclusion = formulaFactory.new(Operation.Necessary(), formulaFactory.new(Operation.Possible(), Q))
     val proof = Problem(logic, listOf(premise), conclusion).prove()
     log("PROVE: { $premise } ⊢ₖ { $conclusion }\n$proof\n\n")
 }
@@ -142,9 +141,9 @@ private fun exModal5(log : (String) -> Unit)
     val Q = formulaFactory.newAtom("Q")
 
     val statement = formulaFactory.new(
-        formulaFactory.new(formulaFactory.new(Operation.Necessary, P), Operation.Or, formulaFactory.new(Operation.Necessary, Q)),
-        Operation.BiImply, formulaFactory.new(Operation.Necessary, formulaFactory.new(
-            formulaFactory.new(Operation.Necessary, P), Operation.Or, formulaFactory.new(Operation.Necessary, Q))))
+        formulaFactory.new(formulaFactory.new(Operation.Necessary(), P), Operation.Or, formulaFactory.new(Operation.Necessary(), Q)),
+        Operation.BiImply, formulaFactory.new(Operation.Necessary(), formulaFactory.new(
+            formulaFactory.new(Operation.Necessary(), P), Operation.Or, formulaFactory.new(Operation.Necessary(), Q))))
     val proof = Problem(logic, listOf(), statement).prove()
     log("PROVE: ⊢ᵦ { $statement }\n$proof\n\n")
 }
@@ -156,8 +155,8 @@ private fun exModal6(log : (String) -> Unit)
     val formulaFactory = FormulaFactory(logic)
     val P = formulaFactory.newAtom("P")
 
-    val statement = formulaFactory.new(formulaFactory.new(Operation.Possible, P), Operation.Imply,
-        formulaFactory.new(Operation.Possible, formulaFactory.new(Operation.Possible, P)))
+    val statement = formulaFactory.new(formulaFactory.new(Operation.Possible(), P), Operation.Imply,
+        formulaFactory.new(Operation.Possible(), formulaFactory.new(Operation.Possible(), P)))
     val proof = Problem(logic, listOf(), statement).prove()
     log("PROVE: ⊢ₛ₅ { $statement }\n$proof\n\n")
 }
@@ -169,8 +168,8 @@ private fun exModal7(log : (String) -> Unit)
     val formulaFactory = FormulaFactory(logic)
     val P = formulaFactory.newAtom("P")
 
-    val statement = formulaFactory.new(formulaFactory.new(Operation.Possible, P), Operation.Imply,
-        formulaFactory.new(Operation.Necessary, formulaFactory.new(Operation.Possible, P)))
+    val statement = formulaFactory.new(formulaFactory.new(Operation.Possible(), P), Operation.Imply,
+        formulaFactory.new(Operation.Necessary(), formulaFactory.new(Operation.Possible(), P)))
     val proof = Problem(logic, listOf(), statement).prove()
     log("PROVE: ⊢ₛ₅ { $statement }\n$proof\n\n")
 }
@@ -183,12 +182,27 @@ private fun exModal8(log : (String) -> Unit)
     val P = formulaFactory.newAtom("P")
     val Q = formulaFactory.newAtom("Q")
 
-    val statement = formulaFactory.new(formulaFactory.new(Operation.Necessary,
-        formulaFactory.new(formulaFactory.new(Operation.Necessary, P), Operation.Imply, formulaFactory.new(Operation.Necessary, Q))),
-        Operation.Or, formulaFactory.new(Operation.Necessary,
-        formulaFactory.new(formulaFactory.new(Operation.Necessary, Q), Operation.Imply, formulaFactory.new(Operation.Necessary, P))))
+    val statement = formulaFactory.new(formulaFactory.new(Operation.Necessary(),
+        formulaFactory.new(formulaFactory.new(Operation.Necessary(), P), Operation.Imply, formulaFactory.new(Operation.Necessary(), Q))),
+        Operation.Or, formulaFactory.new(Operation.Necessary(),
+        formulaFactory.new(formulaFactory.new(Operation.Necessary(), Q), Operation.Imply, formulaFactory.new(Operation.Necessary(), P))))
     val proof = Problem(logic, listOf(), statement).prove()
     log("PROVE: ⊢ₛ₅ { $statement }\n$proof\n\n")
+}
+
+private fun exModal9(log : (String) -> Unit)
+{
+    //⊢ₖ P ⊃ □⤴◇⤵P
+    val logic = FirstOrderModalLogic(ModalLogicType.Kᵗ)
+    val formulaFactory = FormulaFactory(logic)
+    val P = formulaFactory.newAtom("P")
+
+    val necessaryInFuture = Operation.Necessary(isInverted = false, subscript = "⤴")
+    val possibleInPast = Operation.Possible(isInverted = true, subscript = "⤵")
+    val statement = formulaFactory.new(P, Operation.Imply, formulaFactory.new(
+        necessaryInFuture, formulaFactory.new(possibleInPast, P)))
+    val proof = Problem(logic, listOf(), statement).prove()
+    log("PROVE: ⊢ₖ { $statement }\n$proof\n\n")
 }
 
 private fun exPred1(log : (String) -> Unit)

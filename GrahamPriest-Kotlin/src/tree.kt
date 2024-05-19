@@ -7,11 +7,11 @@ class ProofTree
     var isProofCorrect = false
     var hasTimeout = false
 
-    val nodeIdSequence = object : Iterator<Long>
+    val nodeIdSequence = object : Iterator<Int>
     {
-        private var id : Long = 0
-        override fun hasNext() : Boolean = id < Long.MAX_VALUE
-        override fun next() : Long = id++
+        private var id : Int = 0
+        override fun hasNext() : Boolean = id < Int.MAX_VALUE
+        override fun next() : Int = id++
     }
 
     val predicateArgumentInstanceNameSequence = object : Iterator<String>
@@ -22,7 +22,7 @@ class ProofTree
         override fun next() : String = if (char <= 'z') "${char++}" else "c${secondaryIndex++}"
     }
 
-    fun appendSubtree(subtree : ProofSubtree, nodeId : Long)
+    fun appendSubtree(subtree : ProofSubtree, nodeId : Int)
     {
         for ((leaf, path) in getAllLeafsWithPaths())
         {
@@ -90,9 +90,9 @@ class ProofTree
             val formulaFilter = { formula : IFormula ->
                 formula is AtomicFormula ||
                 (formula is ComplexFormula && formula.operation == Operation.Non && formula.x is AtomicFormula) ||
-                (formula is ComplexFormula && formula.operation.isModal && formula.x is AtomicFormula) ||
+                (formula is ComplexFormula && formula.operation is ModalOperation && formula.x is AtomicFormula) ||
                 (formula is ComplexFormula && formula.operation == Operation.Non && formula.x is ComplexFormula
-                    && formula.x.operation.isModal && formula.x.x is AtomicFormula)
+                    && formula.x.operation is ModalOperation && formula.x.x is AtomicFormula)
             }
 
             "COUNTEREXAMPLE: " + getAllPaths().find { !it.isContradictory() }?.getAllFormulas()
@@ -127,7 +127,7 @@ class ProofTreeNodeFactory(val tree : ProofTree)
 
 class ProofTreeNode
 (
-    val id : Long,
+    val id : Int,
     val formula : IFormula,
     var left : ProofTreeNode? = null,
     var right : ProofTreeNode? = null,
@@ -136,7 +136,7 @@ class ProofTreeNode
 {
     var isContradictory = false
 
-    override fun hashCode() = hash(id, formula, left, right)
+    override fun hashCode() = id
     override fun equals(other : Any?) : Boolean
     {
         return (other as? ProofTreeNode)?.let { that ->

@@ -37,6 +37,14 @@ private constructor
         vertices.add(Vertex(from, to))
     }
 
+    fun invertAllVertices()
+    {
+        val invertedVertices = vertices.map { vertex -> Vertex(vertex.to, vertex.from) }
+
+        vertices.clear()
+        vertices.addAll(invertedVertices)
+    }
+
     fun addMissingReflexiveVertices()
     {
         for (node in nodes)
@@ -80,6 +88,31 @@ private constructor
                 {
                     val transitiveVertex = Vertex(iVertex.from, jVertex.to)
                     verticesToAdd.add(transitiveVertex)
+                }
+            }
+        }
+
+        for (vertexToAdd in verticesToAdd)
+        {
+            if (!vertices.contains(vertexToAdd))
+            {
+                vertices.add(vertexToAdd)
+            }
+        }
+    }
+
+    fun addMissingTemporalConvergenceVertices()
+    {
+        val verticesToAdd = mutableListOf<Vertex<NODE>>()
+
+        for (iVertex in vertices)
+        {
+            for (jVertex in vertices)
+            {
+                if (iVertex!=jVertex && iVertex.from==jVertex.from)
+                {
+                    val convergentVertex = Vertex(iVertex.to, jVertex.to)
+                    verticesToAdd.add(convergentVertex)
                 }
             }
         }

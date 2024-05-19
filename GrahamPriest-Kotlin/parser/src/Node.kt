@@ -82,6 +82,26 @@ class Necessary(token: Token, arg: Node) : UnaryOperator(token, arg) {
     }
 }
 
+class Future(token: Token, arg: Node) : UnaryOperator(token, arg) {
+    override fun visit(assignment: VariableAssignment): Boolean {
+        return !arg.visit(assignment)
+    }
+
+    override fun toLaTeX(): String {
+        return "\\lfuture ${arg.toLaTeX()}"
+    }
+}
+
+class Past(token: Token, arg: Node) : UnaryOperator(token, arg) {
+    override fun visit(assignment: VariableAssignment): Boolean {
+        return !arg.visit(assignment)
+    }
+
+    override fun toLaTeX(): String {
+        return "\\lpast ${arg.toLaTeX()}"
+    }
+}
+
 class Literal(token: Token) : Node(token) {
     override fun visit(assignment: VariableAssignment): Boolean {
         return token.value.toBoolean()

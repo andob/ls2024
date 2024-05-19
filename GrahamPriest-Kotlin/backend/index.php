@@ -1,20 +1,14 @@
 <?php
 
-//todo de implementat toate problemele din carte
 const INI_FILE_PATH = 'demo.ini';
-const LOCALHOST_IP = '127.0.0.1';
 const PROBLEM_ARGUMENT_KEY = 'demo_problem';
-const DEBUG_ARGUMENT_KEY = 'debug';
-
-$debugMode = isset($_GET[DEBUG_ARGUMENT_KEY]) ? $_GET[DEBUG_ARGUMENT_KEY] : $_SERVER['REMOTE_ADDR'] == LOCALHOST_IP;
 
 $demoProblems = parse_ini_file(INI_FILE_PATH, true);
 $demoProblemsNames = array_keys($demoProblems);
 
-$demoProblemsLinks = join(array_map(function ($demoProblemName) use ($debugMode) {
+$demoProblemsLinks = join(array_map(function ($demoProblemName) {
     $problemKey = PROBLEM_ARGUMENT_KEY;
-    $debugModeKey = DEBUG_ARGUMENT_KEY;
-    return "<a href=\"?$problemKey=$demoProblemName&$debugModeKey=$debugMode\">$demoProblemName</a> ";
+    return "<a href=\"?$problemKey=$demoProblemName\">$demoProblemName</a> ";
 }, $demoProblemsNames));
 
 $input = "description = ''\nlogic = 'PropositionalLogic'\nvars = 'P'\nconclusion = ''";
@@ -31,8 +25,6 @@ if (isset($demoProblemName) && in_array($demoProblemName, $demoProblemsNames))
     ob_end_clean();
 }
 
-$resultTreeAreaStyle = $debugMode ? 'display: block' : 'display: none';
-
 echo <<<EOHTML
 <!DOCTYPE html>
 <html lang="en">
@@ -48,7 +40,7 @@ echo <<<EOHTML
         <div id="onScreenKeyboard"></div>
         <button id="proveButton">PROVE!</button>
         <div id="resultTextArea"></div>
-        <pre id="resultTreeArea" style="$resultTreeAreaStyle"></pre>
+        <pre id="resultTreeArea"></pre>
     </div>
     
     <div style="float: left; width: 50%; height: 100vh">
