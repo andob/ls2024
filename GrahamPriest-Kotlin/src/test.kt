@@ -192,15 +192,13 @@ private fun exModal8(log : (String) -> Unit)
 
 private fun exModal9(log : (String) -> Unit)
 {
-    //⊢ₖ P ⊃ □⤴◇⤵P
+    //⊢ₖ P ⊃ 🄵ⓅP
     val logic = FirstOrderModalLogic(ModalLogicType.Kᵗ)
     val formulaFactory = FormulaFactory(logic)
     val P = formulaFactory.newAtom("P")
 
-    val necessaryInFuture = Operation.Necessary(isInverted = false, subscript = "⤴")
-    val possibleInPast = Operation.Possible(isInverted = true, subscript = "⤵")
     val statement = formulaFactory.new(P, Operation.Imply, formulaFactory.new(
-        necessaryInFuture, formulaFactory.new(possibleInPast, P)))
+        Operation.Necessary.InFuture(), formulaFactory.new(Operation.Possible.InPast(), P)))
     val proof = Problem(logic, listOf(), statement).prove()
     log("PROVE: ⊢ₖ { $statement }\n$proof\n\n")
 }

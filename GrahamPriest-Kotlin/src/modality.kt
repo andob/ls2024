@@ -37,10 +37,17 @@ class NotPossibleRule : IRule
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         val p = ((node.formula as ComplexFormula).x as ComplexFormula).x
-        val possibleP = (node.formula.x as ComplexFormula).operation as Operation.Possible
-        val necessary = Operation.Necessary(possibleP.isInverted, possibleP.subscript)
+        val possible = (node.formula.x as ComplexFormula).operation as Operation.Possible
+        val necessary = possible.convertedToNecessary()
         val necessaryNonP = factory.newFormula(necessary, factory.newFormula(Operation.Non, p))
         return ProofSubtree(left = factory.newNode(necessaryNonP))
+    }
+
+    private fun Operation.Possible.convertedToNecessary() = when(this)
+    {
+        is Operation.Possible.InFuture -> Operation.Necessary.InFuture()
+        is Operation.Possible.InPast -> Operation.Necessary.InPast()
+        else -> Operation.Necessary()
     }
 }
 
@@ -55,10 +62,17 @@ class NotNecessaryRule : IRule
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         val p = ((node.formula as ComplexFormula).x as ComplexFormula).x
-        val necessaryP = (node.formula.x as ComplexFormula).operation as Operation.Necessary
-        val possible = Operation.Possible(necessaryP.isInverted, necessaryP.subscript)
+        val necessary = (node.formula.x as ComplexFormula).operation as Operation.Necessary
+        val possible = necessary.convertedToPossible()
         val possibleNonP = factory.newFormula(possible, factory.newFormula(Operation.Non, p))
         return ProofSubtree(left = factory.newNode(possibleNonP))
+    }
+
+    private fun Operation.Necessary.convertedToPossible() = when(this)
+    {
+        is Operation.Necessary.InFuture -> Operation.Possible.InFuture()
+        is Operation.Necessary.InPast -> Operation.Possible.InPast()
+        else -> Operation.Possible()
     }
 }
 

@@ -4,7 +4,7 @@ function setupOnScreenKeyboard()
     let inputTextArea = document.getElementById('inputTextArea');
     let operationButtonsContainer = document.getElementById('onScreenKeyboard');
 
-    for (let operation of ['¬', '&', '∨', '⊃', '≡', '□', '◇', '□⤴', '◇⤴', '□⤵', '◇⤵'])
+    for (let operation of ['¬', '∧', '∨', '⊃', '≡', '□', '◇', '🄵', 'Ⓕ', '🄿', 'Ⓟ'])
     {
         let operationButton = document.createElement('button');
         operationButton.textContent = operation;
@@ -25,4 +25,4 @@ function setupOnScreenKeyboard()
     }
 }
 
-setupOnScreenKeyboard();
+setupOnScreenKeyboard()

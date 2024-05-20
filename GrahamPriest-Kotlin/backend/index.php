@@ -25,6 +25,7 @@ if (isset($demoProblemName) && in_array($demoProblemName, $demoProblemsNames))
     ob_end_clean();
 }
 
+header('Content-type: text/html; charset=utf-8');
 echo <<<EOHTML
 <!DOCTYPE html>
 <html lang="en">
@@ -40,7 +41,7 @@ echo <<<EOHTML
         <div id="onScreenKeyboard"></div>
         <button id="proveButton">PROVE!</button>
         <div id="resultTextArea"></div>
-        <pre id="resultTreeArea"></pre>
+        <pre id="resultTreeArea" style="display: none"></pre>
     </div>
     
     <div style="float: left; width: 50%; height: 100vh">

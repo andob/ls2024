@@ -1,35 +1,46 @@
-open class Operation(val sign : Char)
+open class Operation(val sign : String)
 {
     companion object
     {
-        val Non = UnaryOperation(sign = '¬')
-        val And = Operation(sign = '∧')
-        val Or = Operation(sign = '∨')
-        val Imply = Operation(sign = '⊃')
-        val BiImply = Operation(sign = '≡')
+        val Non = UnaryOperation(sign = "¬")
+        val And = Operation(sign = "∧")
+        val Or = Operation(sign = "∨")
+        val Imply = Operation(sign = "⊃")
+        val BiImply = Operation(sign = "≡")
     }
 
-    class Necessary(isInverted : Boolean = false, subscript : String = "") : ModalOperation(sign = '□', isInverted, subscript)
-    class Possible(isInverted : Boolean = false, subscript : String = "") : ModalOperation(sign = '◇', isInverted, subscript)
+    open class Necessary(sign : String, isInverted : Boolean) : ModalOperation(sign, isInverted)
+    {
+        constructor() : this(sign = "□", isInverted = false)
+        class InFuture : Necessary(sign = "🄵", isInverted = false)
+        class InPast : Necessary(sign = "🄿", isInverted = true)
+    }
 
-    class ForAll(x : BindingPredicateArgument) : QuantifierOperation(sign = '∀', x)
-    class Exists(x : BindingPredicateArgument) : QuantifierOperation(sign = '∃', x)
+    open class Possible(sign : String, isInverted : Boolean) : ModalOperation(sign, isInverted)
+    {
+        constructor() : this(sign = "◇", isInverted = false)
+        class InFuture : Possible(sign = "Ⓕ", isInverted = false)
+        class InPast : Possible(sign = "Ⓟ", isInverted = true)
+    }
+
+    class ForAll(x : BindingPredicateArgument) : QuantifierOperation(sign = "∀", x)
+    class Exists(x : BindingPredicateArgument) : QuantifierOperation(sign = "∃", x)
 
     override fun equals(other : Any?) = (other as? Operation)?.sign==sign
     override fun hashCode() = sign.hashCode()
-    override fun toString() = sign.toString()
+    override fun toString() = sign
 }
 
-open class UnaryOperation(sign : Char) : Operation(sign)
+open class UnaryOperation(sign : String) : Operation(sign)
 
-open class ModalOperation(sign : Char, val isInverted : Boolean, val subscript : String) : UnaryOperation(sign)
+open class ModalOperation(sign : String, val isInverted : Boolean) : UnaryOperation(sign)
 {
     override fun equals(other : Any?) = super.equals(other) && (other as? ModalOperation)?.isInverted==isInverted
     override fun hashCode() = hash(sign, isInverted)
-    override fun toString() = "$sign$subscript"
+    override fun toString() = sign
 }
 
-open class QuantifierOperation(sign : Char, val x : BindingPredicateArgument) : UnaryOperation(sign)
+open class QuantifierOperation(sign : String, val x : BindingPredicateArgument) : UnaryOperation(sign)
 {
     override fun equals(other : Any?) = super.equals(other) && (other as? QuantifierOperation)?.x==x
     override fun hashCode() = hash(sign, x)

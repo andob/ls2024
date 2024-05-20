@@ -55,22 +55,22 @@ object ConfigParser
 
         fun convertNode(node : Node) : IFormula
         {
-            return when
+            return when(node)
             {
-                node is Variable -> findAtomicFormula(node)
-                node is Not -> formulaFactory.new(Operation.Non, convertNode(node.arg))
-                node is And -> formulaFactory.new(convertNode(node.left), Operation.And, convertNode(node.right))
-                node is Or -> formulaFactory.new(convertNode(node.left), Operation.Or, convertNode(node.right))
-                node is Implies -> formulaFactory.new(convertNode(node.left), Operation.Imply, convertNode(node.right))
-                node is IfAndOnlyIf -> formulaFactory.new(convertNode(node.left), Operation.BiImply, convertNode(node.right))
+                is Variable -> findAtomicFormula(node)
+                is Not -> formulaFactory.new(Operation.Non, convertNode(node.arg))
+                is And -> formulaFactory.new(convertNode(node.left), Operation.And, convertNode(node.right))
+                is Or -> formulaFactory.new(convertNode(node.left), Operation.Or, convertNode(node.right))
+                is Implies -> formulaFactory.new(convertNode(node.left), Operation.Imply, convertNode(node.right))
+                is IfAndOnlyIf -> formulaFactory.new(convertNode(node.left), Operation.BiImply, convertNode(node.right))
 
-                node is Necessary && node.arg is Past -> formulaFactory.new(Operation.Necessary(isInverted = true, subscript = "⤵"), convertNode(node.arg.arg))
-                node is Necessary && node.arg is Future -> formulaFactory.new(Operation.Necessary(subscript = "⤴"), convertNode(node.arg.arg))
-                node is Necessary -> formulaFactory.new(Operation.Necessary(), convertNode(node.arg))
+                is NecessaryInFuture -> formulaFactory.new(Operation.Necessary.InFuture(), convertNode(node.arg))
+                is NecessaryInPast -> formulaFactory.new(Operation.Necessary.InPast(), convertNode(node.arg))
+                is Necessary -> formulaFactory.new(Operation.Necessary(), convertNode(node.arg))
 
-                node is Possible && node.arg is Past -> formulaFactory.new(Operation.Possible(isInverted = true, subscript = "⤵"), convertNode(node.arg.arg))
-                node is Possible && node.arg is Future -> formulaFactory.new(Operation.Possible(subscript = "⤴"), convertNode(node.arg.arg))
-                node is Possible -> formulaFactory.new(Operation.Possible(), convertNode(node.arg))
+                is PossibleInFuture -> formulaFactory.new(Operation.Possible.InFuture(), convertNode(node.arg))
+                is PossibleInPast -> formulaFactory.new(Operation.Possible.InPast(), convertNode(node.arg))
+                is Possible -> formulaFactory.new(Operation.Possible(), convertNode(node.arg))
 
                 else -> throw RuntimeException("Invalid node $node")
             }

@@ -82,23 +82,43 @@ class Necessary(token: Token, arg: Node) : UnaryOperator(token, arg) {
     }
 }
 
-class Future(token: Token, arg: Node) : UnaryOperator(token, arg) {
+class PossibleInFuture(token: Token, arg: Node) : UnaryOperator(token, arg) {
     override fun visit(assignment: VariableAssignment): Boolean {
         return !arg.visit(assignment)
     }
 
     override fun toLaTeX(): String {
-        return "\\lfuture ${arg.toLaTeX()}"
+        return "\\lpossible_in_future ${arg.toLaTeX()}"
     }
 }
 
-class Past(token: Token, arg: Node) : UnaryOperator(token, arg) {
+class NecessaryInFuture(token: Token, arg: Node) : UnaryOperator(token, arg) {
     override fun visit(assignment: VariableAssignment): Boolean {
         return !arg.visit(assignment)
     }
 
     override fun toLaTeX(): String {
-        return "\\lpast ${arg.toLaTeX()}"
+        return "\\lnecessary_in_future ${arg.toLaTeX()}"
+    }
+}
+
+class PossibleInPast(token: Token, arg: Node) : UnaryOperator(token, arg) {
+    override fun visit(assignment: VariableAssignment): Boolean {
+        return !arg.visit(assignment)
+    }
+
+    override fun toLaTeX(): String {
+        return "\\lpossible_in_past ${arg.toLaTeX()}"
+    }
+}
+
+class NecessaryInPast(token: Token, arg: Node) : UnaryOperator(token, arg) {
+    override fun visit(assignment: VariableAssignment): Boolean {
+        return !arg.visit(assignment)
+    }
+
+    override fun toLaTeX(): String {
+        return "\\lnecessary_in_past ${arg.toLaTeX()}"
     }
 }
 

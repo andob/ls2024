@@ -18,12 +18,3 @@ zip ./backend/artifact.zip \
   ./backend/target-js.js.map \
   ./backend/keyboard.js \
   ./backend/tree-prettifier.js
-
-sudo cp ./backend/demo.ini /var/www/html
-sudo cp ./backend/index.php /var/www/html
-sudo cp ./backend/target-js.js /var/www/html
-sudo cp ./backend/target-js.js.map /var/www/html
-sudo cp ./backend/keyboard.js /var/www/html
-sudo cp ./backend/tree-prettifier.js /var/www/html
-
-firefox localhost &
