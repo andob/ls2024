@@ -1,6 +1,7 @@
 interface IRule
 {
-    fun isApplicable(node : ProofTreeNode) : Boolean
+    fun isApplicable(node : ProofTreeNode) = isApplicable(node.formula.formulaFactory.logic, node)
+    fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
 
     fun apply(node : ProofTreeNode) = apply(RuleApplyFactory(node), node)
     fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
@@ -16,6 +17,11 @@ class RuleApplyFactory(private val node : ProofTreeNode)
     fun newFormula(operation : Operation, x : IFormula) : ComplexFormula
     {
         return node.formula.formulaFactory.new(operation, x)
+    }
+
+    fun newFormula(x : IFormula, operation : Operation, y : IFormula) : ComplexFormula
+    {
+        return node.formula.formulaFactory.new(x, operation, y)
     }
 
     fun newModalRelationDescriptor(fromWorld : PossibleWorld, toWorld : PossibleWorld) : ModalRelationDescriptorFormula
@@ -36,7 +42,7 @@ class RuleApplyFactory(private val node : ProofTreeNode)
 
 class DoubleNegationRule : IRule
 {
-    override fun isApplicable(node : ProofTreeNode) : Boolean
+    override fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
     {
         return (node.formula as? ComplexFormula)?.operation == Operation.Non &&
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.Non
@@ -52,7 +58,7 @@ class DoubleNegationRule : IRule
 
 class OrRule : IRule
 {
-    override fun isApplicable(node : ProofTreeNode) : Boolean
+    override fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
     {
         return (node.formula as? ComplexFormula)?.operation == Operation.Or
     }
@@ -69,7 +75,7 @@ class OrRule : IRule
 
 class NotOrRule : IRule
 {
-    override fun isApplicable(node : ProofTreeNode) : Boolean
+    override fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
     {
         return (node.formula as? ComplexFormula)?.operation == Operation.Non &&
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.Or
@@ -90,7 +96,7 @@ class NotOrRule : IRule
 
 class AndRule : IRule
 {
-    override fun isApplicable(node : ProofTreeNode) : Boolean
+    override fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
     {
         return (node.formula as? ComplexFormula)?.operation == Operation.And
     }
@@ -109,7 +115,7 @@ class AndRule : IRule
 
 class NotAndRule : IRule
 {
-    override fun isApplicable(node : ProofTreeNode) : Boolean
+    override fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
     {
         return (node.formula as? ComplexFormula)?.operation == Operation.Non &&
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.And
@@ -128,7 +134,7 @@ class NotAndRule : IRule
 
 class ImplyRule : IRule
 {
-    override fun isApplicable(node : ProofTreeNode) : Boolean
+    override fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
     {
         return (node.formula as? ComplexFormula)?.operation == Operation.Imply
     }
@@ -145,7 +151,7 @@ class ImplyRule : IRule
 
 class NotImplyRule : IRule
 {
-    override fun isApplicable(node : ProofTreeNode) : Boolean
+    override fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
     {
         return (node.formula as? ComplexFormula)?.operation == Operation.Non &&
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.Imply
@@ -166,7 +172,7 @@ class NotImplyRule : IRule
 
 class BiImplyRule : IRule
 {
-    override fun isApplicable(node : ProofTreeNode) : Boolean
+    override fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
     {
         return (node.formula as? ComplexFormula)?.operation == Operation.BiImply
     }
@@ -189,7 +195,7 @@ class BiImplyRule : IRule
 
 class NotBiImplyRule : IRule
 {
-    override fun isApplicable(node : ProofTreeNode) : Boolean
+    override fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
     {
         return (node.formula as? ComplexFormula)?.operation == Operation.Non &&
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.BiImply
@@ -209,5 +215,39 @@ class NotBiImplyRule : IRule
                 left = factory.newNode(node.formula.x.y)
             ),
         )
+    }
+}
+
+class StrictImplicationRule : IRule
+{
+    override fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
+    {
+        return (node.formula as? ComplexFormula)?.operation == Operation.StrictImply
+    }
+
+    override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
+    {
+        node.formula as ComplexFormula
+        return ProofSubtree(
+            factory.newNode(factory.newFormula(Operation.Necessary(),
+                factory.newFormula(node.formula.x, Operation.Imply, node.formula.y!!))))
+    }
+}
+
+class NotStrictImplicationRule : IRule
+{
+    override fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
+    {
+        return (node.formula as? ComplexFormula)?.operation == Operation.Non &&
+                ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.StrictImply
+    }
+
+    override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
+    {
+        node.formula as ComplexFormula
+        node.formula.x as ComplexFormula
+        return ProofSubtree(
+            factory.newNode(factory.newFormula(Operation.Non, factory.newFormula(Operation.Necessary(),
+                factory.newFormula(node.formula.x.x, Operation.Imply, node.formula.x.y!!)))))
     }
 }

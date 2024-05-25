@@ -61,7 +61,8 @@ class FirstOrderModalLogic(val type : ModalLogicType) : ILogic
     {
         return arrayOf(*BASIC_RULES,
             NotNecessaryRule(), NotPossibleRule(), NecessaryRule(), PossibleRule(),
-            NotExistsRule(), NotForAllRule(), ExistsRule(), ForAllRule())
+            NotExistsRule(), NotForAllRule(), ExistsRule(), ForAllRule(),
+            StrictImplicationRule(), NotStrictImplicationRule())
     }
 
     override fun isOperationAvailable(operation : Operation) : Boolean
@@ -69,6 +70,7 @@ class FirstOrderModalLogic(val type : ModalLogicType) : ILogic
         return operation in BASIC_OPERATIONS
                 || operation is Operation.Possible || operation is Operation.Necessary
                 || operation is Operation.ForAll || operation is Operation.Exists
+                || operation == Operation.StrictImply
     }
 
     override fun clearCache()

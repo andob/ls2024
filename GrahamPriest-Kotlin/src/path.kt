@@ -86,6 +86,14 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
         return ProofTreePath(nodes.plus(newNodes))
     }
 
+    fun subPath(startIndex : Int, endIndex : Int) : ProofTreePath
+    {
+        if (startIndex >= 0 && startIndex < nodes.size && endIndex >= 0 && endIndex < nodes.size)
+            return ProofTreePath(nodes.subList(fromIndex = startIndex, toIndex = endIndex))
+
+        throw RuntimeException("Invalid subPath range: $startIndex - $endIndex!")
+    }
+
     fun getAllFormulas() : List<IFormula>
     {
         return nodes.map { node -> node.formula }

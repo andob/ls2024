@@ -7,6 +7,7 @@ open class Operation(val sign : String)
         val Or = Operation(sign = "∨")
         val Imply = Operation(sign = "⊃")
         val BiImply = Operation(sign = "≡")
+        val StrictImply = Operation(sign = "⥽")
     }
 
     open class Necessary(sign : String, isInverted : Boolean) : ModalOperation(sign, isInverted)

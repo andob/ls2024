@@ -68,7 +68,7 @@ fun IPredicateArgument.cloned() : IPredicateArgument
 
 class NotExistsRule : IRule
 {
-    override fun isApplicable(node : ProofTreeNode) : Boolean
+    override fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
     {
         return (node.formula as? ComplexFormula)?.operation == Operation.Non &&
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation is Operation.Exists
@@ -87,7 +87,7 @@ class NotExistsRule : IRule
 
 class NotForAllRule : IRule
 {
-    override fun isApplicable(node : ProofTreeNode) : Boolean
+    override fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
     {
         return (node.formula as? ComplexFormula)?.operation == Operation.Non &&
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation is Operation.ForAll
@@ -106,7 +106,7 @@ class NotForAllRule : IRule
 
 class ExistsRule : IRule
 {
-    override fun isApplicable(node : ProofTreeNode) : Boolean
+    override fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
     {
         return (node.formula as? ComplexFormula)?.operation is Operation.Exists
     }
@@ -124,7 +124,7 @@ class ExistsRule : IRule
 
 class ForAllRule : IRule
 {
-    override fun isApplicable(node : ProofTreeNode) : Boolean
+    override fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
     {
         return (node.formula as? ComplexFormula)?.operation is Operation.ForAll
     }

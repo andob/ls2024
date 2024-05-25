@@ -96,6 +96,12 @@ enum class TokenType(
         { value, args -> IfAndOnlyIf(Token(this, value), args[0], args[1]) },
         OperatorPrecedence.LOW
     ),
+    STRICTLY_IMPLIES(
+        Regex("""(⥽)|(\bstrictly_implies\b)|(\\bstrict_implies\b)"""),
+        TokenCategory.OP_BINARY_INFIX,
+        { value, args -> StrictlyImplies(Token(this, value), args[0], args[1]) },
+        OperatorPrecedence.MEDIUM
+    ),
     OPEN_PAREN(
         Regex(Regex.escape(Logik.subExpressionHighlightChar.toString()) + """?\("""),
         TokenCategory.GROUPING

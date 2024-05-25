@@ -169,6 +169,18 @@ class Implies(token: Token, left: Node, right: Node) : BinaryOperator(token, lef
     }
 }
 
+class StrictlyImplies(token: Token, left: Node, right: Node) : BinaryOperator(token, left, right) {
+    override fun visit(assignment: VariableAssignment): Boolean {
+        val leftValue = left.visit(assignment)
+        val rightValue = right.visit(assignment)
+        return !leftValue || (leftValue && rightValue)
+    }
+
+    override fun toLaTeX(): String {
+        return "(${left.toLaTeX()} \\strictly_implies ${right.toLaTeX()})"
+    }
+}
+
 class IfAndOnlyIf(token: Token, left: Node, right: Node) : BinaryOperator(token, left, right) {
     override fun visit(assignment: VariableAssignment): Boolean {
         val leftValue = left.visit(assignment)

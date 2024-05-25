@@ -7,6 +7,7 @@ fun test(log : (String) -> Unit)
         ::exPred1, ::exPred2, ::exPred3, ::exPred4,
         ::exModal4, ::exModal5, ::exModal6,
         ::exModal7, ::exModal8, ::exModal9,
+        ::exModal10
     )
 
     for (function in functions)
@@ -201,6 +202,21 @@ private fun exModal9(log : (String) -> Unit)
         Operation.Necessary.InFuture(), formulaFactory.new(Operation.Possible.InPast(), P)))
     val proof = Problem(logic, listOf(), statement).prove()
     log("PROVE: ⊢ₖ { $statement }\n$proof\n\n")
+}
+
+private fun exModal10(log : (String) -> Unit)
+{
+    //⊢ₙ (A⥽B) ⥽ (¬B⥽¬A)
+    val logic = FirstOrderModalLogic(ModalLogicType.N)
+    val formulaFactory = FormulaFactory(logic)
+    val A = formulaFactory.newAtom("A")
+    val B = formulaFactory.newAtom("B")
+
+    val statement = formulaFactory.new(
+        formulaFactory.new(A, Operation.StrictImply, B), Operation.StrictImply,
+        formulaFactory.new(formulaFactory.new(Operation.Non, B), Operation.StrictImply, formulaFactory.new(Operation.Non, A)))
+    val proof = Problem(logic, listOf(), statement).prove()
+    log("PROVE: ⊢ₙ { $statement }\n$proof\n\n")
 }
 
 private fun exPred1(log : (String) -> Unit)

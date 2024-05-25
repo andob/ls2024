@@ -24,6 +24,10 @@ object ConfigParser
             "TModalLogic" -> FirstOrderModalLogic(ModalLogicType.T)
             "DModalLogic" -> FirstOrderModalLogic(ModalLogicType.D)
             "BModalLogic" -> FirstOrderModalLogic(ModalLogicType.B)
+            "NModalLogic" -> FirstOrderModalLogic(ModalLogicType.N)
+            "S2ModalLogic" -> FirstOrderModalLogic(ModalLogicType.S2)
+            "S3ModalLogic" -> FirstOrderModalLogic(ModalLogicType.S3)
+            "S3.5ModalLogic" -> FirstOrderModalLogic(ModalLogicType.S35)
             "S4ModalLogic" -> FirstOrderModalLogic(ModalLogicType.S4)
             "S5ModalLogic" -> FirstOrderModalLogic(ModalLogicType.S5)
             "KTemporalModalLogic" -> FirstOrderModalLogic(ModalLogicType.Kᵗ)
@@ -63,6 +67,7 @@ object ConfigParser
                 is Or -> formulaFactory.new(convertNode(node.left), Operation.Or, convertNode(node.right))
                 is Implies -> formulaFactory.new(convertNode(node.left), Operation.Imply, convertNode(node.right))
                 is IfAndOnlyIf -> formulaFactory.new(convertNode(node.left), Operation.BiImply, convertNode(node.right))
+                is StrictlyImplies -> formulaFactory.new(convertNode(node.left), Operation.StrictImply, convertNode(node.right))
 
                 is NecessaryInFuture -> formulaFactory.new(Operation.Necessary.InFuture(), convertNode(node.arg))
                 is NecessaryInPast -> formulaFactory.new(Operation.Necessary.InPast(), convertNode(node.arg))
