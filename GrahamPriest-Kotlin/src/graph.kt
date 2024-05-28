@@ -2,7 +2,7 @@ class Graph<NODE : Comparable<NODE>>
 private constructor
 (
     val nodes : MutableList<NODE>,
-    val vertices : MutableList<Vertex<NODE>>,
+    val vertices : MutableSet<Vertex<NODE>>,
 )
 {
     class Vertex<NODE : Comparable<NODE>>(val from : NODE, val to : NODE)
@@ -28,7 +28,7 @@ private constructor
     {
         fun <NODE : Comparable<NODE>> withNodes(nodes : List<NODE>) : Graph<NODE>
         {
-            return Graph(nodes.toMutableList(), vertices = mutableListOf())
+            return Graph(nodes.toMutableList(), vertices = mutableSetOf())
         }
     }
     
@@ -130,6 +130,7 @@ private constructor
     (
         val startNode : NODE,
         val startVertices : List<Vertex<NODE>> = listOf(),
+        val isCompleteIteration : Boolean = false,
     )
 
     fun iterate(args : IterationArgs<NODE>) : List<Vertex<NODE>>
@@ -152,8 +153,12 @@ private constructor
             {
                 alreadyVisitedVertices.add(startVertex)
                 callback.invoke(startVertex)
-                nodesToVisit.add(startVertex.from)
-                nodesToVisit.add(startVertex.to)
+
+                if (args.isCompleteIteration)
+                {
+                    nodesToVisit.add(startVertex.from)
+                    nodesToVisit.add(startVertex.to)
+                }
             }
         }
 
@@ -166,12 +171,12 @@ private constructor
                     alreadyVisitedVertices.add(vertex)
                     callback.invoke(vertex)
 
-                    if (!alreadyVisitedNodes.contains(vertex.from))
+                    if (args.isCompleteIteration && !alreadyVisitedNodes.contains(vertex.from))
                     {
                         nodesToVisit.add(vertex.from)
                     }
 
-                    if (!alreadyVisitedNodes.contains(vertex.to))
+                    if (args.isCompleteIteration && !alreadyVisitedNodes.contains(vertex.to))
                     {
                         nodesToVisit.add(vertex.to)
                     }

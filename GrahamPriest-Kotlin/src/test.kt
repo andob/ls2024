@@ -7,7 +7,8 @@ fun test(log : (String) -> Unit)
         ::exPred1, ::exPred2, ::exPred3, ::exPred4,
         ::exModal4, ::exModal5, ::exModal6,
         ::exModal7, ::exModal8, ::exModal9,
-        ::exModal10
+        ::exModal10, ::exModal11, ::exModal12,
+        ::exModal13, ::exModal14,
     )
 
     for (function in functions)
@@ -135,8 +136,8 @@ private fun exModal4(log : (String) -> Unit)
 
 private fun exModal5(log : (String) -> Unit)
 {
-    // ⊢ᵦ { □P ∨ □Q } ≡ { □(□P ∨ □Q) }
-    val logic = FirstOrderModalLogic(ModalLogicType.B)
+    // ⊢ { □P ∨ □Q } ≡ { □(□P ∨ □Q) }
+    val logic = FirstOrderModalLogic(ModalLogicType.S5)
     val formulaFactory = FormulaFactory(logic)
     val P = formulaFactory.newAtom("P")
     val Q = formulaFactory.newAtom("Q")
@@ -217,6 +218,62 @@ private fun exModal10(log : (String) -> Unit)
         formulaFactory.new(formulaFactory.new(Operation.Non, B), Operation.StrictImply, formulaFactory.new(Operation.Non, A)))
     val proof = Problem(logic, listOf(), statement).prove()
     log("PROVE: ⊢ₙ { $statement }\n$proof\n\n")
+}
+
+private fun exModal11(log : (String) -> Unit)
+{
+    val configString = """
+        logic = 'KModalLogic'
+        description = 'NOT PROVED! [EXPECTED]'
+        vars = 'p'
+        conclusion = '□p ⊃ □□p'
+    """
+
+    val problem = Problem.fromConfig(configString)
+    val proof = problem.prove()
+    log("${proof}\n\n")
+}
+
+private fun exModal12(log : (String) -> Unit)
+{
+    val configString = """
+        logic = 'NModalLogic'
+        description = 'NOT PROVED! [EXPECTED]'
+        vars = 'p, q'
+        conclusion = '(p⥽q)⥽(□p⥽□q)'
+    """
+
+    val problem = Problem.fromConfig(configString)
+    val proof = problem.prove()
+    log("${proof}\n\n")
+}
+
+private fun exModal13(log : (String) -> Unit)
+{
+    val configString = """
+        logic = 'TModalLogic'
+        description = 'PROVED! [EXPECTED]'
+        vars = 'A, B'
+        conclusion = '◇(A ⊃ B) ≡ (□A ⊃ ◇B)'
+    """
+
+    val problem = Problem.fromConfig(configString)
+    val proof = problem.prove()
+    log("${proof}\n\n")
+}
+
+private fun exModal14(log : (String) -> Unit)
+{
+    val configString = """
+        logic = 'KTemporalModalLogic'
+        description = 'NOT PROVED! [EXPECTED]'
+        vars = 'p, q'
+        conclusion = 'Ⓟ🄿p ⊃ 🄿Ⓟp'
+    """
+
+    val problem = Problem.fromConfig(configString)
+    val proof = problem.prove()
+    log("${proof}\n\n")
 }
 
 private fun exPred1(log : (String) -> Unit)
