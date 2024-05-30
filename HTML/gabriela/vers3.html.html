@@ -1,0 +1,174 @@
+<HTML>
+
+<HEAD>
+<Title>Proiect la curs "Logica si Software"</Title>
+
+
+
+
+<style>
+
+h1 {text-align: center;}
+p {text-align: center;}
+div {text-align: center;}
+
+
+txable, txh, txd, txr {
+ border: 1px solid black;
+ border-collapse: collapse;
+ 
+ 
+ div.yoyo {
+  position: relative;
+  left: 20px;
+  border: 3px solid #73AD21;
+}
+}
+
+</style>
+
+</head>
+
+
+<BODY>
+
+
+
+<table style="align:center; border: 3px solid black; border-collapse: collapse; margin-left: auto; margin-right: auto">
+
+<tbody>
+
+<tr>
+<th style="font-size:18; font-style:italic">
+<center>
+Calculator pentru tableaux in lucrarea lui Graham Priest<br><br>
+„Introducere in logica Non-Clasica“<br>
+</center>
+</th>
+</tr>
+
+</tbody>
+</table>
+
+
+<br>
+<font size=2>
+
+<div align=center>
+Curs de Logica si Software 2024, prof. Marian Calborean, Facultatea de Filosofie, UNIBUC
+</div>
+
+<br><br><br><br>
+
+
+
+<table>
+<tr>
+	<td>
+
+<div align="left">
+<a href="https://www.amazon.com/Introduction-Non-Classical-Logic-Second-Introductions/dp/0521670268"> 
+<img src="https://m.media-amazon.com/images/I/41C5gSGiKoL._SY445_SX342_.jpg" width="200" />
+
+</a>
+</div>
+
+<br><br>
+
+<button type="button" style="font-weight:bold; background-color:yellow; width: 150px; height: 30px">Home<br></button>
+<br><br>
+
+<button type="button" style="font-weight:bold; background-color:red; width: 150px; height: 30px">Librarie<br></button>
+<br><br>
+
+<button type="button" style="font-weight:bold; background-color:red; width: 150px; height: 30px">Ghid pagina<br></button>
+<br><br>
+
+<button type="button" style="font-weight:bold; background-color:red; width: 150px; height: 30px">Echipa<br></button>
+<br><br>
+
+
+<br><br>
+</td>
+
+<td>
+
+<button type="button">Prove it!</button>
+
+<input type="text" align="center" maxlength="20" size="40" placeholder="(p &or; (q &and; r)) &rarr; ((p &or; q) &and; (p &or; r)">
+
+<section id="problem">
+<div id="yoyo">
+
+            <section id="yoyo-section">
+            <img src="https://laptedulce.github.io/sitefilo/yoyo.png" id="yoyo-image" alt="Yoyo Image" width="100">
+        </section>
+</div>
+		
+        <section id="result">
+            <p>(p &or; (q &and; r)) &rarr; ((p &or; q) &and; (p &or; r)) is valid.</p>
+            <img src="https://laptedulce.github.io/sitefilo/tableau.png" alt="Tableau Result">
+        </section>
+		
+<div align="center"> <strong>Introduceti</strong> <em>formulele</em> pentru care doriti tabelul de adevar  </div>
+<br>
+    <div id="symbol-insert">
+                <button>&and;</button>
+                <button>&or;</button>
+                <button>&rarr;</button>
+                <button>&harr;</button>
+                <button>&not;</button>
+                <button>(</button>
+                <button>)</button>
+            </div>
+			
+<br>
+</td>
+
+
+</tr>
+
+
+
+<tr>
+
+</tr>
+
+</table>
+
+
+
+
+	<div align="center">
+	<form method="post">
+		Formula 1: <input type="text" name="PREMISA1" /> 	<br /><br />
+		Formula 2: <input type="text" name="PREMISA2" /> 	<br /><br />
+		Formula 3: <input type="text" name="PREMISA3" /> 	<br /><br />
+		Formula 4: <input type="text" name="PREMISA4" /> 	<br /><br />
+		Formula 5: <input type="text" name="PREMISA5" /> 	<br /><br />
+		
+		Concluzie: <input type="text" name="concluzie" /> 	<br /><br />
+		
+		<br>
+		<input type="submit" value="Trimite"  />
+	</form>
+	
+		<br />
+
+	<input id="hide" type="submit" value="Ascunde/Afiseaza"  />
+	
+	<h2 style="color: red;"> <p> Linii rezultate din calculator </h2>
+</div>
+
+
+ 
+        <section id="problem">
+            <input type="text" id="logic-input" placeholder="(p ? (q ? r)) ? ((p ? q) ? (p ? r))">
+	
+
+		
+
+
+</BODY>
+
+</HTML>

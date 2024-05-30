@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logic and Software 2024</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Calculator for tableaux in Graham Priest's Introduction to Non-Classical Logic</h1>
+        <p>Curs Logica si Software 2024, Fac de Fil, Unibuc</p>
+    </header>
+    <main>
+        <section id="problem">
+            <input type="text" id="logic-input" placeholder="(p ∨ (q ∧ r)) → ((p ∨ q) ∧ (p ∨ r))">
+            <div id="symbol-insert">
+                <button>∧</button>
+                <button>∨</button>
+                <button>→</button>
+                <button>↔</button>
+                <button>¬</button>
+                <button>(</button>
+                <button>)</button>
+            </div>
+            <button id="prove-button">Prove IT</button>
+        </section>
+        <section id="yoyo-section">
+            <img src="yoyo.png" id="yoyo-image" alt="Yoyo Image">
+        </section>
+        <section id="result">
+            <p>(p ∨ (q ∧ r)) → ((p ∨ q) ∧ (p ∨ r)) is valid.</p>
+            <img src="tableau.png" alt="Tableau Result">
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Logic and Software. All rights reserved.</p>
+    </footer>
+    <script src="scripts.js"></script>
+</body>
+</html>
