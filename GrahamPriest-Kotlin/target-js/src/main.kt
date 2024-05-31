@@ -3,18 +3,12 @@ import kotlinx.browser.window
 import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLTextAreaElement
-import org.w3c.dom.url.URLSearchParams
 
 external fun refreshPrettyTreeUI(contents : String);
 
 fun main()
 {
-    val view = View()
-
-    if (URLSearchParams(window.location.search).has("demo_problem"))
-    {
-        window.setTimeout({ view.clickProveButton() }, 100);
-    }
+    View()
 }
 
 class View
@@ -32,18 +26,12 @@ class View
         }
     }
 
-    fun clickProveButton()
-    {
-        onProveButtonClicked()
-    }
-
     private fun onProveButtonClicked()
     {
         val inputToProve = inputTextArea.value
         resultTextArea.innerHTML = "Proving..."
         resultTreeArea.textContent = ""
         refreshPrettyTreeUI("")
-        proveButton.hidden = true
 
         window.setTimeout(handler = {
             prove(inputToProve)
@@ -61,14 +49,12 @@ class View
             resultTextArea.innerHTML = textResult.toHTMLString()
             resultTreeArea.textContent = treeResult
             refreshPrettyTreeUI(treeResult)
-            proveButton.hidden = false
         }
         catch (ex : Throwable)
         {
             resultTextArea.innerHTML = ex.stackTraceToString().toHTMLString()
             resultTreeArea.textContent = ""
             refreshPrettyTreeUI("")
-            proveButton.hidden = false
         }
     }
 

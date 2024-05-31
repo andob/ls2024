@@ -13,8 +13,12 @@ cp ./target-js/build/dist/js/productionExecutable/target-js.js.map ./backend
 
 zip ./backend/artifact.zip \
   ./backend/demo.ini \
+  ./backend/chapters.json \
   ./backend/index.php \
   ./backend/target-js.js \
   ./backend/target-js.js.map \
   ./backend/keyboard.js \
-  ./backend/tree-prettifier.js
+  ./backend/tree-prettifier.js \
+  ./backend/book.jpg \
+  ./backend/styles.css \
+  ./backend/yoyo-animation.js
