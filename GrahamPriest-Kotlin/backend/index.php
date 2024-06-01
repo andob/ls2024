@@ -58,7 +58,10 @@ echo <<<EOHTML
 
     <main>
         <div style="float: left; width: 20%">
-            <img src="book.jpg" style="width: 50%"/>
+            <a href="https://www.emag.ro/an-introduction-to-non-classical-logic-from-if-to-is-graham-priest-author-9780521670265/pd/DQM6D9BBM/" target="_blank">
+                <img src="book.jpg" alt="The book" style="width: 50%"/>
+            </a>
+            
             <br/><br/><b>Select exercise:</b>
             <div class="accordion">$demoProblemsLinks</div>
         </div>

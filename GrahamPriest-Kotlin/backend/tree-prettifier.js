@@ -63,6 +63,7 @@ window.refreshPrettyTreeUIImpl = (rawContents) =>
         layout: {
             name: 'dagre',
         },
+        wheelSensitivity: 0.1,
         style: [
             {
                 selector: 'node',
