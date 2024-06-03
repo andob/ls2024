@@ -22,7 +22,7 @@ $demoProblemsLinks = join(array_map(function ($bookChapter) use ($demoProblemsNa
     return "<div class=\"accordion\">CH$bookChapterNumber $bookChapter:<br/>$demoProblemsLinks</div>";
 }, $bookChapters));
 
-$input = "description = ''\nlogic = 'PropositionalLogic'\nvars = 'P'\nconclusion = ''";
+$input = "description = ''\nlogic = 'PropositionalLogic'\nvars = 'P'\nconclusion = 'P ∨ ¬P'";
 
 $demoProblemName = $_GET[PROBLEM_ARGUMENT_KEY] ?? null;
 if (isset($demoProblemName) && in_array($demoProblemName, $demoProblemsNames))
@@ -52,13 +52,13 @@ echo <<<EOHTML
 <body>
 
     <header>
-        <h1>Calculator for tableaux in Graham Priest's Introduction to Non-Classical Logic</h1>
-        <p>Curs Logica si Software 2024, Faculty of Philosophy, Bucharest University</p>
+        <h1>INCL Tableaux Calculator</h1>
+        <p>Calculator for tableaux in Graham Priest's Introduction to Non-Classical Logic. <b>"Logic and Software" course</b>, 2024, Faculty of Philosophy, University of Bucharest</p>
     </header>
 
     <main>
         <div style="float: left; width: 20%">
-            <a href="https://www.emag.ro/an-introduction-to-non-classical-logic-from-if-to-is-graham-priest-author-9780521670265/pd/DQM6D9BBM/" target="_blank">
+            <a href="https://www.cambridge.org/core/books/an-introduction-to-nonclassical-logic/61AD69C1D1B88006588B26C37F3A788E" target="_blank">
                 <img src="book.jpg" alt="The book" style="width: 50%"/>
             </a>
             
@@ -72,7 +72,7 @@ echo <<<EOHTML
 
             <div id="onScreenKeyboard"></div>
 
-            <button id="proveButton">PROVE!</button>
+            <button id="proveButton" style="background-color: #007BFF">PROVE!</button>
 
             <section id="animation-section"><div id="hand"><div id="yoyo"></div></div></section>
 
@@ -86,7 +86,7 @@ echo <<<EOHTML
     </main>
 
     <footer>
-        <p>&copy; 2024 Logica si Software team. Educational purposes only.</p>
+        <p>Educational purposes only. Version 1.0. Contact: mc@filos.ro</p>
     </footer>
 
     <script src="target-js.js"></script>

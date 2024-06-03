@@ -10,7 +10,7 @@ class ProofTree
     val nodeIdSequence = object : Iterator<Int>
     {
         private var id : Int = 0
-        override fun hasNext() : Boolean = id < Int.MAX_VALUE
+        override fun hasNext() : Boolean = id < 1500
         override fun next() : Int = id++
     }
 
