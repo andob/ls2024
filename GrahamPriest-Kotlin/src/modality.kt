@@ -181,10 +181,10 @@ class NecessaryRule : IRule
             graph.invertAllVertices()
         }
 
-        if (modalLogic.type.isTemporal)
-        {
-            graph.addMissingTemporalConvergenceVertices()
-        }
+//        if (modalLogic.type.isTemporal)
+//        {
+//            graph.addMissingTemporalConvergenceVertices()
+//        }
 
         if (modalLogic.type.isReflexive)
         {
