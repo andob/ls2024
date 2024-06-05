@@ -175,9 +175,9 @@
     "@types/node" "*"
 
 "@types/node@*", "@types/node@>=10.0.0":
-  version "20.14.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.14.1.tgz#2434dbcb1f039e31f2c0e9969da93f52cf6348f3"
-  integrity sha512-T2MzSGEu+ysB/FkWfqmhV3PLyQlowdptmmgD20C6QxsS8Fmv5SjpZ1ayXaEC0S21/h5UJ9iA6W/5vSNU5l00OA==
+  version "20.14.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.14.2.tgz#a5f4d2bcb4b6a87bffcaa717718c5a0f208f4a18"
+  integrity sha512-xyu6WAMVwv6AKFLB+e/7ySZVr/0zLCzOa7rSpq6jNwpqOrUbcACDWC+53d4n2QHOnDou0fbIsg8wZu/sxrnI4Q==
   dependencies:
     undici-types "~5.26.4"
 
@@ -433,14 +433,14 @@ ajv@^6.12.5:
     uri-js "^4.2.2"
 
 ajv@^8.0.0, ajv@^8.9.0:
-  version "8.15.0"
-  resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.15.0.tgz#d918c661e3e820bbbc65a320e182ee56a1aa978a"
-  integrity sha512-15BTtQUOsSrmHCy+B4VnAiJAJxJ8IFgu6fcjFQF3jQYZ78nLSQthlFg4ehp+NLIyfvFgOlxNsjKIEhydtFPVHQ==
+  version "8.16.0"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.16.0.tgz#22e2a92b94f005f7e0f9c9d39652ef0b8f6f0cb4"
+  integrity sha512-F0twR8U1ZU67JIEtekUcLkXkoO5mMMmgGD8sK/xUFzJ805jxHQl92hImFAqqXMyMYjSPOyUPAwHYhB72g5sTXw==
   dependencies:
     fast-deep-equal "^3.1.3"
-    fast-uri "^2.3.0"
     json-schema-traverse "^1.0.0"
     require-from-string "^2.0.2"
+    uri-js "^4.4.1"
 
 ansi-colors@4.1.1:
   version "4.1.1"
@@ -597,9 +597,9 @@ camelcase@^6.0.0:
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
 caniuse-lite@^1.0.30001587:
-  version "1.0.30001627"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001627.tgz#8071c42d468e06ed2fb2c545efe79a663fd326ab"
-  integrity sha512-4zgNiB8nTyV/tHhwZrFs88ryjls/lHiqFhrxCW4qSTeuRByBVnPYpDInchOIySWknznucaf31Z4KYqjfbrecVw==
+  version "1.0.30001628"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001628.tgz#90b6cd85ddc2e9f831de0225f4ca5a130c8d8222"
+  integrity sha512-S3BnR4Kh26TBxbi5t5kpbcUlLJb9lhtDXISDPwOfI+JoC+ik0QksvkZtUVyikw3hjnkgkMPSJ8oIM9yMm9vflA==
 
 chalk@^4.1.0:
   version "4.1.2"
@@ -888,9 +888,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.4.668:
-  version "1.4.788"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.788.tgz#a3545959d5cfa0a266d3e551386c040be34e7e06"
-  integrity sha512-ubp5+Ev/VV8KuRoWnfP2QF2Bg+O2ZFdb49DiiNbz2VmgkIqrnyYaqIOqj8A6K/3p1xV0QcU5hBQ1+BmB6ot1OA==
+  version "1.4.790"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.790.tgz#2a3a5509593745c5d65d8acd66b308f2a25da041"
+  integrity sha512-eVGeQxpaBYbomDBa/Mehrs28MdvCXfJmEFzaMFsv8jH/MJDLIylJN81eTJ5kvx7B7p18OiPK0BkC06lydEy63A==
 
 emoji-regex@^8.0.0:
   version "8.0.0"
@@ -924,9 +924,9 @@ engine.io@~6.5.2:
     ws "~8.11.0"
 
 enhanced-resolve@^5.13.0:
-  version "5.16.1"
-  resolved "https://registry.yarnpkg.com/enhanced-resolve/-/enhanced-resolve-5.16.1.tgz#e8bc63d51b826d6f1cbc0a150ecb5a8b0c62e567"
-  integrity sha512-4U5pNsuDl0EhuZpq46M5xPslstkviJuhrdobaRDBk2Jy2KO37FDAJl4lb2KlNabxT0m4MTK2UHNrsAcphE8nyw==
+  version "5.17.0"
+  resolved "https://registry.yarnpkg.com/enhanced-resolve/-/enhanced-resolve-5.17.0.tgz#d037603789dd9555b89aaec7eb78845c49089bc5"
+  integrity sha512-dwDPwZL0dmye8Txp2gzFmA6sxALaSvdRDjPH0viLcKrtlOL3tw62nWWweVD1SdILDTJrbrL6tdWVN58Wo6U3eA==
   dependencies:
     graceful-fs "^4.2.4"
     tapable "^2.2.0"
@@ -1079,11 +1079,6 @@ fast-json-stable-stringify@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/fast-json-stable-stringify/-/fast-json-stable-stringify-2.1.0.tgz#874bf69c6f404c2b5d99c481341399fd55892633"
   integrity sha512-lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==
-
-fast-uri@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/fast-uri/-/fast-uri-2.3.0.tgz#bdae493942483d299e7285dcb4627767d42e2793"
-  integrity sha512-eel5UKGn369gGEWOqBShmFJWfq/xSJvsgDzgLYC845GneayWvXBf0lJCBn5qTABfewy1ZDPoaR5OZCP+kssfuw==
 
 fastest-levenshtein@^1.0.12:
   version "1.0.16"
@@ -2573,7 +2568,7 @@ update-browserslist-db@^1.0.13:
     escalade "^3.1.2"
     picocolors "^1.0.1"
 
-uri-js@^4.2.2:
+uri-js@^4.2.2, uri-js@^4.4.1:
   version "4.4.1"
   resolved "https://registry.yarnpkg.com/uri-js/-/uri-js-4.4.1.tgz#9b1a52595225859e55f669d928f88c6c57f2a77e"
   integrity sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==

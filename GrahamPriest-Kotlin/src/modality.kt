@@ -106,8 +106,7 @@ class PossibleRule : IRule
         val originalSubFormula = (node.formula as ComplexFormula).x
         val originalOperation = node.formula.operation as ModalOperation
 
-        val path = node.getPathFromRootToLeafsThroughNode()
-        val forkedWorld = path.nodes.maxOf { it.formula.possibleWorld }.fork()
+        val forkedWorld = factory.tree.getAllPossibleWorlds().max().fork()
 
         val newNode = factory.newNode(originalSubFormula.inWorld(forkedWorld))
 

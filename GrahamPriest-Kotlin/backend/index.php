@@ -86,7 +86,7 @@ echo <<<EOHTML
     </main>
 
     <footer>
-        <p>Educational purposes only. Version 1.0. Contact: mc@filos.ro</p>
+        <p>Educational purposes only. Version 1.1. Contact: mc@filos.ro. <a href="https://github.com/mcfilos/ls2024">Source code</a></p>
     </footer>
 
     <script src="target-js.js"></script>
