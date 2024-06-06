@@ -25,8 +25,7 @@ class Problem
         {
             val node = decompositionQueue.pop() ?: continue
 
-            val rule = logic.getRules().find { rule -> rule.isApplicable(node) }
-            val subtree = rule?.apply(proofTree, node)
+            val subtree = logic.getRules().find { rule -> rule.isApplicable(node) }?.apply(node)
             if (subtree != null)
             {
                 proofTree.appendSubtree(subtree, node.id)
