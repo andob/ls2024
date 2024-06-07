@@ -74,6 +74,8 @@ class NotExistsRule : IRule
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation is Operation.Exists
     }
 
+    override fun wouldBranchTheTree() = false
+
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         val original = ((node.formula as ComplexFormula).x as ComplexFormula)
@@ -93,6 +95,8 @@ class NotForAllRule : IRule
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation is Operation.ForAll
     }
 
+    override fun wouldBranchTheTree() = false
+
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         val original = ((node.formula as ComplexFormula).x as ComplexFormula)
@@ -111,6 +115,8 @@ class ExistsRule : IRule
         return (node.formula as? ComplexFormula)?.operation is Operation.Exists
     }
 
+    override fun wouldBranchTheTree() = false
+
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         val originalFormula = node.formula as ComplexFormula
@@ -128,6 +134,8 @@ class ForAllRule : IRule
     {
         return (node.formula as? ComplexFormula)?.operation is Operation.ForAll
     }
+
+    override fun wouldBranchTheTree() = false
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {

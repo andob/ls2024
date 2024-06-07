@@ -18,14 +18,15 @@ class Problem
     {
         val proofTree = buildInitialProofTree()
 
-        val decompositionQueue = DecompositionPriorityQueue()
+        val decompositionQueue = DecompositionPriorityQueue(logic)
         decompositionQueue.push(proofTree)
 
         while (!decompositionQueue.isEmpty() && proofTree.nodeIdSequence.hasNext())
         {
             val node = decompositionQueue.pop() ?: continue
 
-            val subtree = logic.getRules().find { rule -> rule.isApplicable(node) }?.apply(node)
+            val ruleToApply = logic.getRules().find { rule -> rule.isApplicable(node) }
+            val subtree = ruleToApply?.apply(node)
             if (subtree != null)
             {
                 proofTree.appendSubtree(subtree, node.id)
@@ -84,7 +85,7 @@ class Problem
     }
 }
 
-class DecompositionPriorityQueue
+class DecompositionPriorityQueue(val logic : ILogic)
 {
     private enum class Priority { High, Normal, Low }
 
@@ -151,10 +152,13 @@ class DecompositionPriorityQueue
 
     private fun getNodePriority(node : ProofTreeNode) : Priority
     {
+        val ruleToApply = logic.getRules().find { rule -> rule.isApplicable(node) }
+
         return when
         {
             node.formula is ComplexFormula && node.formula.operation is Operation.Necessary -> Priority.Low
-            else -> Priority.Normal
+            ruleToApply!=null && ruleToApply.wouldBranchTheTree() -> Priority.Normal
+            else -> Priority.High
         }
     }
 

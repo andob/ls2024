@@ -39,6 +39,8 @@ class NotPossibleRule : IRule
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation is Operation.Possible
     }
 
+    override fun wouldBranchTheTree() = false
+
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         val p = ((node.formula as ComplexFormula).x as ComplexFormula).x
@@ -63,6 +65,8 @@ class NotNecessaryRule : IRule
         return (node.formula as? ComplexFormula)?.operation == Operation.Non &&
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation is Operation.Necessary
     }
+
+    override fun wouldBranchTheTree() = false
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
@@ -100,6 +104,8 @@ class PossibleRule : IRule
         return formulaIsPossible
     }
 
+    override fun wouldBranchTheTree() = false
+
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         val modalLogic = factory.getLogic() as FirstOrderModalLogic
@@ -127,6 +133,8 @@ class NecessaryRule : IRule
     {
         return (node.formula as? ComplexFormula)?.operation is Operation.Necessary
     }
+
+    override fun wouldBranchTheTree() = false
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {

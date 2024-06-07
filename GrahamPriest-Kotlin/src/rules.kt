@@ -3,6 +3,8 @@ interface IRule
     fun isApplicable(node : ProofTreeNode) = isApplicable(node.formula.formulaFactory.logic, node)
     fun isApplicable(logic : ILogic, node : ProofTreeNode) : Boolean
 
+    fun wouldBranchTheTree() : Boolean
+
     fun apply(node : ProofTreeNode) = apply(RuleApplyFactory(node), node)
     fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
 }
@@ -48,6 +50,8 @@ class DoubleNegationRule : IRule
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.Non
     }
 
+    override fun wouldBranchTheTree() = false
+
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         node.formula as ComplexFormula
@@ -62,6 +66,8 @@ class OrRule : IRule
     {
         return (node.formula as? ComplexFormula)?.operation == Operation.Or
     }
+
+    override fun wouldBranchTheTree() = true
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
@@ -80,6 +86,8 @@ class NotOrRule : IRule
         return (node.formula as? ComplexFormula)?.operation == Operation.Non &&
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.Or
     }
+
+    override fun wouldBranchTheTree() = false
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
@@ -101,6 +109,8 @@ class AndRule : IRule
         return (node.formula as? ComplexFormula)?.operation == Operation.And
     }
 
+    override fun wouldBranchTheTree() = false
+
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         node.formula as ComplexFormula
@@ -121,6 +131,8 @@ class NotAndRule : IRule
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.And
     }
 
+    override fun wouldBranchTheTree() = true
+
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         node.formula as ComplexFormula
@@ -139,6 +151,8 @@ class ImplyRule : IRule
         return (node.formula as? ComplexFormula)?.operation == Operation.Imply
     }
 
+    override fun wouldBranchTheTree() = true
+
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         node.formula as ComplexFormula
@@ -156,6 +170,8 @@ class NotImplyRule : IRule
         return (node.formula as? ComplexFormula)?.operation == Operation.Non &&
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.Imply
     }
+
+    override fun wouldBranchTheTree() = false
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
@@ -176,6 +192,8 @@ class BiImplyRule : IRule
     {
         return (node.formula as? ComplexFormula)?.operation == Operation.BiImply
     }
+
+    override fun wouldBranchTheTree() = true
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
@@ -201,6 +219,8 @@ class NotBiImplyRule : IRule
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.BiImply
     }
 
+    override fun wouldBranchTheTree() = true
+
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         node.formula as ComplexFormula
@@ -225,6 +245,8 @@ class StrictImplicationRule : IRule
         return (node.formula as? ComplexFormula)?.operation == Operation.StrictImply
     }
 
+    override fun wouldBranchTheTree() = false
+
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
         node.formula as ComplexFormula
@@ -241,6 +263,8 @@ class NotStrictImplicationRule : IRule
         return (node.formula as? ComplexFormula)?.operation == Operation.Non &&
                 ((node.formula as? ComplexFormula)?.x as? ComplexFormula)?.operation == Operation.StrictImply
     }
+
+    override fun wouldBranchTheTree() = false
 
     override fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
     {
