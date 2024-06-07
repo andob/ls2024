@@ -49,13 +49,19 @@ private fun testAllProblemsFromFile(iniFile : File)
         val proof = problem.prove()
         log("${proof}\n\n")
 
-        if (problemContents.contains("NOT PROVED! [EXPECTED]") && proof.isProofCorrect)
+        val expectedNotProved = problemContents.contains("NOT PROVED! [EXPECTED]")
+        val expectedProved = !expectedNotProved && problemContents.contains("PROVED! [EXPECTED]")
+
+        if (expectedNotProved && proof.isProofCorrect)
         {
             throw RuntimeException("Problem $problemName: expected NOT PROVED but got PROVED!")
         }
-        else if (problemContents.contains("PROVED! [EXPECTED]") && !proof.isProofCorrect)
+
+        if (expectedProved && !proof.isProofCorrect)
         {
             throw RuntimeException("Problem $problemName: expected PROVED but got NOT PROVED!")
         }
     }
+
+    log("ALL TESTS PASSED!\n")
 }

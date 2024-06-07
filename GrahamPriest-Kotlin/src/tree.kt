@@ -72,8 +72,8 @@ class ProofTree
     fun getPathFromRootToLeafsThroughNode(node : ProofTreeNode) : ProofTreePath
     {
         val paths = getAllLeafsWithPaths().map { (_, path) -> path }
-        val foundPath = paths.find { path -> path.nodes.contains(node) }
-        return foundPath ?: ProofTreePath(listOf(rootNode))
+        val foundPaths = paths.filter { path -> path.nodes.contains(node) }
+        return foundPaths.shuffled().firstOrNull() ?: ProofTreePath(listOf(rootNode))
     }
 
     fun getAllPossibleWorlds() : List<PossibleWorld>

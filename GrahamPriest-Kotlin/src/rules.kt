@@ -5,11 +5,11 @@ interface IRule
 
     fun wouldBranchTheTree() : Boolean
 
-    fun apply(node : ProofTreeNode) = apply(RuleApplyFactory(node), node)
+    fun apply(tree : ProofTree, node : ProofTreeNode) = apply(RuleApplyFactory(tree, node), node)
     fun apply(factory : RuleApplyFactory, node : ProofTreeNode) : ProofSubtree
 }
 
-class RuleApplyFactory(private val node : ProofTreeNode)
+class RuleApplyFactory(val tree : ProofTree, private val node : ProofTreeNode)
 {
     fun newNode(formula : IFormula, left : ProofTreeNode? = null, right : ProofTreeNode? = null) : ProofTreeNode
     {
