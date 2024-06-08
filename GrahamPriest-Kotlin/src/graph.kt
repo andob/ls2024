@@ -1,8 +1,7 @@
 class Graph<NODE : Comparable<NODE>>
-private constructor
 (
-    val nodes : MutableList<NODE>,
-    val vertices : MutableSet<Vertex<NODE>>,
+    private val nodes : MutableSet<NODE> = mutableSetOf(),
+    private val vertices : MutableSet<Vertex<NODE>> = mutableSetOf(),
 )
 {
     class Vertex<NODE : Comparable<NODE>>(val from : NODE, val to : NODE)
@@ -24,14 +23,16 @@ private constructor
         }
     }
 
-    companion object
+    fun isEmpty() : Boolean
     {
-        fun <NODE : Comparable<NODE>> withNodes(nodes : List<NODE>) : Graph<NODE>
-        {
-            return Graph(nodes.toMutableList(), vertices = mutableSetOf())
-        }
+        return nodes.isEmpty() && vertices.isEmpty()
     }
-    
+
+    fun addNode(node : NODE)
+    {
+        nodes.add(node)
+    }
+
     fun addVertex(from : NODE, to : NODE)
     {
         vertices.add(Vertex(from, to))

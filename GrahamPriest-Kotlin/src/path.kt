@@ -86,6 +86,11 @@ class ProofTreePath(val nodes : List<ProofTreeNode>)
         return ProofTreePath(nodes.plus(newNodes))
     }
 
+    fun getRootNode() : ProofTreeNode
+    {
+        return nodes.firstOrNull()!!
+    }
+
     fun getAllFormulas() : List<IFormula>
     {
         return nodes.map { node -> node.formula }

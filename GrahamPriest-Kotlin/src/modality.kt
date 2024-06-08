@@ -143,9 +143,9 @@ class NecessaryRule : IRule
         val originalOperation = node.formula.operation as Operation.Necessary
 
         val path = node.getPathFromRootToLeafsThroughNode()
-        val graph = buildNecessityGraph(modalLogic, originalOperation, path)
+        val graph = buildNecessityGraph(modalLogic, originalOperation, path.getRootNode())
 
-        if (graph.vertices.isEmpty())
+        if (graph.isEmpty())
         {
             return if (modalLogic.type.isExtendable)
                 PossibleRule().apply(factory, node)
@@ -175,13 +175,22 @@ class NecessaryRule : IRule
         return ProofSubtree.empty()
     }
 
-    private fun buildNecessityGraph(modalLogic : FirstOrderModalLogic, operation : Operation.Necessary, path : ProofTreePath) : Graph<PossibleWorld>
+    private fun buildNecessityGraph(modalLogic : FirstOrderModalLogic, operation : Operation.Necessary, rootNode : ProofTreeNode) : Graph<PossibleWorld>
     {
-        val graph = Graph.withNodes(path.getAllPossibleWorlds())
+        val paths = rootNode.getAllPaths()
+        val graph = Graph<PossibleWorld>()
 
-        for (formula in path.getAllFormulas().filterIsInstance<ModalRelationDescriptorFormula>())
+        for (path in paths)
         {
-            graph.addVertex(formula.fromWorld, formula.toWorld)
+            for (possibleWorld in path.getAllPossibleWorlds())
+            {
+                graph.addNode(possibleWorld)
+            }
+
+            for (formula in path.getAllFormulas().filterIsInstance<ModalRelationDescriptorFormula>())
+            {
+                graph.addVertex(formula.fromWorld, formula.toWorld)
+            }
         }
 
         if (modalLogic.type.isTemporal && operation.isInverted)

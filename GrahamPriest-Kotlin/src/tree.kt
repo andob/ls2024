@@ -46,23 +46,9 @@ class ProofTree
         }
     }
 
-    fun getAllLeafs() : List<ProofTreeNode>
-    {
-        return getAllLeafsWithPaths().map { (node, path) -> node }
-    }
-
-    fun getAllPaths() : List<ProofTreePath>
-    {
-        return getAllLeafsWithPaths().map { (node, path) -> path }
-    }
-
-    fun getAllLeafsWithPaths() : List<Pair<ProofTreeNode, ProofTreePath>>
-    {
-        val leafs = mutableListOf<Pair<ProofTreeNode, ProofTreePath>>()
-        val path = ProofTreePath(nodes = listOf(rootNode))
-        this.rootNode.findAllLeafsWithPaths(leafs, path)
-        return leafs
-    }
+    fun getAllLeafs() = rootNode.getAllLeafs()
+    fun getAllPaths() = rootNode.getAllPaths()
+    fun getAllLeafsWithPaths() = rootNode.getAllLeafsWithPaths()
 
     fun attachNodeFactory(nodeFactory : ProofTreeNodeFactory)
     {
@@ -73,7 +59,7 @@ class ProofTree
     {
         val paths = getAllLeafsWithPaths().map { (_, path) -> path }
         val foundPaths = paths.filter { path -> path.nodes.contains(node) }
-        return foundPaths.shuffled().firstOrNull() ?: ProofTreePath(listOf(rootNode))
+        return foundPaths.firstOrNull() ?: ProofTreePath(listOf(rootNode))
     }
 
     fun getAllPossibleWorlds() : List<PossibleWorld>
@@ -159,6 +145,25 @@ class ProofTreeNode
             this.left?.findAllLeafs(outLeafs)
             this.right?.findAllLeafs(outLeafs)
         }
+    }
+
+    fun getAllLeafs() : List<ProofTreeNode>
+    {
+        return getAllLeafsWithPaths().map { (leaf, path) -> leaf }
+    }
+
+    fun getAllPaths() : List<ProofTreePath>
+    {
+        return getAllLeafsWithPaths().map { (leaf, path) -> path }
+    }
+
+    fun getAllLeafsWithPaths() : List<Pair<ProofTreeNode, ProofTreePath>>
+    {
+        val rootNode = this
+        val leafs = mutableListOf<Pair<ProofTreeNode, ProofTreePath>>()
+        val path = ProofTreePath(nodes = listOf(rootNode))
+        rootNode.findAllLeafsWithPaths(leafs, path)
+        return leafs
     }
 
     fun findAllLeafsWithPaths(outLeafs : MutableList<Pair<ProofTreeNode, ProofTreePath>>, outPath : ProofTreePath)
