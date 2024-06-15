@@ -64,6 +64,9 @@ echo <<<EOHTML
             
             <br/><br/><b>Select exercise:</b>
             <div class="accordion">$demoProblemsLinks</div>
+
+            <br/><b>Read the description of the calculator <a href="https://figshare.com/articles/presentation/Calborean_Dobrescu_2024_-_Trees_algorithms_and_logics_-_A_Calculator_for_Priest_s_INCL/25996027" target="_blank">here</a> and the GitHub repository <a href="https://github.com/mcfilos/ls2024" target="_blank">here</a>.</b><br/><br/>
+
         </div>
 
         <div style="float: left; width: 40%;">
