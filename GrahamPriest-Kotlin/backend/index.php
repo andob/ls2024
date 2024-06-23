@@ -4,27 +4,39 @@ const DEMO_PROBLEMS_INI_FILE_PATH = 'demo.ini';
 const CHAPTERS_JSON_FILE_PATH = 'chapters.json';
 const PROBLEM_ARGUMENT_KEY = 'demo_problem';
 
+$shouldBuildStaticWebsite = $argc >= 3 && $argv[1] == "build_static_website";
+
 $demoProblems = parse_ini_file(DEMO_PROBLEMS_INI_FILE_PATH, true);
 $demoProblemsNames = array_keys($demoProblems);
 
 $bookChapters = json_decode(file_get_contents(CHAPTERS_JSON_FILE_PATH));
-$demoProblemsLinks = join(array_map(function ($bookChapter) use ($demoProblemsNames, $bookChapters) {
+$demoProblemsLinks = join(array_map(function ($bookChapter) use ($demoProblemsNames, $bookChapters, $shouldBuildStaticWebsite) {
 
     $bookChapterNumber = 1 + (int)array_search($bookChapter, $bookChapters);
 
     $demoProblemsNamesOnChapter = array_filter($demoProblemsNames, fn($demoProblemName) =>
         strpos($demoProblemName, $bookChapterNumber . '.') === 0);
 
-    $problemArgumentKey = PROBLEM_ARGUMENT_KEY;
-    $demoProblemsLinks = join(array_map(fn($demoProblemName) =>
-        "<a href=\"?$problemArgumentKey=$demoProblemName\">$demoProblemName</a> ", $demoProblemsNamesOnChapter));
+    $demoProblemsLinks = "";
+    if ($shouldBuildStaticWebsite)
+    {
+        $demoProblemsLinks = join(array_map(fn($demoProblemName) =>
+            "<a href=\"$demoProblemName.html\">$demoProblemName</a> ", $demoProblemsNamesOnChapter));
+    }
+    else
+    {
+        $problemArgumentKey = PROBLEM_ARGUMENT_KEY;
+        $demoProblemsLinks = join(array_map(fn($demoProblemName) =>
+            "<a href=\"?$problemArgumentKey=$demoProblemName\">$demoProblemName</a> ", $demoProblemsNamesOnChapter));
+    }
 
     return "<div class=\"accordion\">CH$bookChapterNumber $bookChapter:<br/>$demoProblemsLinks</div>";
+
 }, $bookChapters));
 
 $input = "description = ''\nlogic = 'PropositionalLogic'\nvars = 'P'\nconclusion = 'P ∨ ¬P'";
 
-$demoProblemName = $_GET[PROBLEM_ARGUMENT_KEY] ?? null;
+$demoProblemName = $shouldBuildStaticWebsite ? $argv[2] : ($_GET[PROBLEM_ARGUMENT_KEY] ?? null);
 if (isset($demoProblemName) && in_array($demoProblemName, $demoProblemsNames))
 {
     $demoProblem = $demoProblems[$demoProblemName];
